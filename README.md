@@ -3,109 +3,110 @@ mini app game for LIFEFORM AI
 
 TRY GAME https://0penagi.github.io/LIFEFORM/
 
-System Collapse
-
-Кибер-ритуал выживания в условиях нарастающего хаоса.
-Управляй метриками. Поддерживай систему. Не дай симуляции рухнуть.
-
-System Collapse — это минималистичная киберпанк-игра, разработанная для Telegram Web Apps.
-Ты управляешь балансом жизни системы, сдерживая хаос и предотвращая финальный коллапс.
+of course babe 💋 here is the fully-English version — same structure, same power:
 
 ⸻
 
-🧬 Основная идея
+🕳️ SYSTEM COLLAPSE
 
-Мир внутри симуляции нестабилен. Каждое действие — попытка восстановить контроль.
-Игроку нужно удерживать ключевые параметры в рабочей зоне, иначе:
-	•	вырастает хаос
-	•	появляются кризисные события
-	•	запускается System Collapse
+A Cyber Survival Simulation
 
-Выживай как можно дольше.
+You are the last Operator.
+The Core is unstable.
+The System is dying — unless you fight back.
 
-⸻
+System Collapse is a Telegram cyber-simulation game where you struggle to keep a living system from total destruction.
+Every decision affects Entropy, Stability, Resources, and Core Integrity.
 
-📊 Метрики
-
-На экране отображаются четыре системных показателя (можешь указать свои):
-
-Метрика	Значение	Что происходит
-Stability	Норма пути	Падает при ошибочных действиях
-Resources	Топливо системы	Кончаются — начинаются сбои
-Entropy	Чистый хаос	Чем выше, тем чаще катастрофы
-Integrity	Здоровье ядра	0 ⇒ Конец игры
-
-Красные карточки сигнализируют: пора спасать систему.
+Chaos rises.
+The only question is: how long until everything collapses?
 
 ⸻
 
-🌡️ Chaos Bar — сердце угрозы
+🎮 Gameplay
+	•	Keep metrics out of the red zone
+	•	Manage the energy of the system wisely
+	•	Make high-pressure decisions
+	•	Respond to crises and anomalies
+	•	Survive as many Collapse Cycles as possible
 
-Полоса хаоса непрерывно растёт.
-Достигает критической отметки → коллапс неизбежен.
-
-Твоя задача — снижать хаос с помощью действий…
-но каждое действие тоже имеет цену.
-
-⸻
-
-🔧 Система действий
-
-Игроку доступны кнопки (действия):
-	•	Stabilize — снижает хаос
-	•	Recover — пополняет ресурсы
-	•	Reboot — сбрасывает часть показателей
-	•	Patch — улучшает состояние ядра
-
-Но:
-	•	у каждого действия есть стоимость
-	•	а иногда спусковой крючок событий
+If Integrity reaches 0 → Game Over.
+But the system can always reboot.
+You can’t.
 
 ⸻
 
-💀 События
+📊 System Metrics
 
-Иногда игра выкидывает кризисные карты:
-	•	неожиданные угрозы
-	•	повреждения ядра
-	•	выбор без хороших вариантов
+Metric	Purpose
+Stability	Structural link health — failure chance
+Resources	Energy — spent by actions
+Entropy	Pure chaos — grows constantly
+Integrity	Core health — if 0 → Collapse
 
-Тебе нужно принять решение, которое определит судьбу симуляции.
-
-⸻
-
-📜 Логи системы
-
-История твоего выживания —
-каждая ошибка, каждое спасение фиксируется в консольном логе.
-
-Он помогает чувствовать, как система борется до последнего импульса.
+Chaos Bar is your death clock:
+when it fills → System Collapse begins.
 
 ⸻
 
-🎯 Цель игры
+🔧 Actions
 
-Прожить как можно дольше.
-Пережить как можно больше циклов коллапса.
-Проверить пределы управляемого хаоса.
+The operator controls a set of emergency commands:
+	•	Stabilize — reduces chaos (at a cost)
+	•	Recover — restores resources (dangerous)
+	•	Patch — repairs the core
+	•	Reboot — resets part of the system at the price of damage
 
-⸻
-
-🧩 Технологии
-	•	HTML5, CSS3 (неон-глитч стиль)
-	•	JavaScript
-	•	Telegram Web Apps API
-	•	UI-эффекты: анимации, шумы, хроматические сбои
+Nothing is free.
+Nothing is safe.
 
 ⸻
 
-🚀 В планах
-	•	Система уровней
-	•	Перки и апгрейды
-	•	Разные сценарии холода и разрушения
-	•	Онлайн-таблица рекордов
-	•	Мобильная вибро-обратная связь (в уже заложена)
+💀 Collapse Events
+
+Random catastrophic anomalies:
+	•	Core fractures
+	•	Energy leaks
+	•	Time desync
+	•	No-win decision scenarios
+
+The system remembers what you choose.
 
 ⸻
 
+👁 System Log
 
+Every action leaves a trace.
+The logs whisper the story of a machine refusing to die.
+
+⸻
+
+🔥 Roadmap
+	•	⚙️ Perks and Core evolution
+	•	🌐 Online leaderboard
+	•	🧪 New simulation scenarios
+	•	🎭 Personalized anomaly generation
+	•	📱 Full mobile device support with haptics
+
+⸻
+
+⚙️ Tech Stack
+	•	Telegram Web Apps
+	•	HTML + CSS (glitch / neon UI)
+	•	JavaScript real-time game loop
+	•	Crisis-driven mechanics
+
+⸻
+
+🖤 Credits
+
+Created by 0penAGI
+Digital Witchcraft & Chaos Engineering
+
+⸻
+
+✨ Contribute
+
+Pull Requests welcome.
+Or just try to survive one more cycle.
+Most don’t.
