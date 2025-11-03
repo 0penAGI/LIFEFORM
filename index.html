@@ -1,738 +1,1329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>System Collapse</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            color: #00ff41;
-            overflow-x: hidden;
-            touch-action: pan-y;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            min-height: 100vh;
-        }
-
-        .tg-viewport {
-            width: 100vw;
-            min-height: 100vh;
-        }
-
-        .container {
-            padding: 12px;
-            padding-bottom: 80px;
-        }
-
-        .header {
-            background: rgba(0, 255, 65, 0.05);
-            border: 1px solid #00ff41;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 6px;
-            text-shadow: 0 0 8px #00ff41;
-        }
-
-        .cycle-info {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .metric-card {
-            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
-            border: 1px solid #00ff41;
-            border-radius: 10px;
-            padding: 12px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 255, 65, 0.1);
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: #00ff41;
-            animation: scan 2s linear infinite;
-        }
-
-        @keyframes scan {
-            0%, 100% { transform: translateX(-100%); }
-            50% { transform: translateX(100%); }
-        }
-
-        .metric-label {
-            font-size: 10px;
-            opacity: 0.6;
-            margin-bottom: 4px;
-            letter-spacing: 1px;
-        }
-
-        .metric-value {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .metric-card.alert {
-            border-color: #ff0000;
-            color: #ff0000;
-            animation: pulse 1s infinite;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        .chaos-section {
-            background: rgba(255, 0, 0, 0.05);
-            border: 1px solid #ff0000;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-
-        .chaos-label {
-            font-size: 11px;
-            color: #ff0000;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .chaos-bar {
-            width: 100%;
-            height: 24px;
-            background: #1a1a1a;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .chaos-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff0000, #ff00ff);
-            transition: width 0.4s ease;
-            box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
-            border-radius: 12px;
-        }
-
-        .chaos-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 4px #000;
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .action-btn {
-            background: rgba(0, 255, 65, 0.1);
-            border: 1.5px solid #00ff41;
-            color: #00ff41;
-            border-radius: 10px;
-            padding: 14px 10px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-btn:active {
-            transform: scale(0.96);
-            background: rgba(0, 255, 65, 0.2);
-        }
-
-        .action-cost {
-            font-size: 10px;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-
-        .action-btn.disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            border-color: #555;
-            color: #555;
-        }
-
-        .log-section {
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #00ff41;
-            border-radius: 10px;
-            padding: 12px;
-            max-height: 140px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-        }
-
-        .log-entry {
-            font-size: 11px;
-            margin-bottom: 6px;
-            line-height: 1.4;
-            opacity: 0;
-            animation: fadeIn 0.4s forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        .log-entry.crisis {
-            color: #ff6b6b;
-        }
-
-        .log-entry.collapse {
-            color: #ff00ff;
-            font-weight: bold;
-        }
-
-        .event-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .event-overlay.active {
-            display: flex;
-        }
-
-        .event-card {
-            background: #0a0a0a;
-            border: 2px solid #ff0000;
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 340px;
-            width: 100%;
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
-            transform: scale(0.9);
-            animation: popIn 0.3s forwards;
-        }
-
-        @keyframes popIn {
-            to { transform: scale(1); }
-        }
-
-        .event-title {
-            font-size: 18px;
-            color: #ff0000;
-            margin-bottom: 12px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .event-text {
-            font-size: 13px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .event-btn {
-            width: 100%;
-            padding: 14px;
-            background: rgba(255, 0, 0, 0.2);
-            border: 1.5px solid #ff0000;
-            color: #ff0000;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .event-btn:active {
-            background: rgba(255, 0, 0, 0.3);
-            transform: scale(0.98);
-        }
-
-        .info-section {
-            background: rgba(0, 255, 65, 0.03);
-            border: 1px solid rgba(0, 255, 65, 0.3);
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 10px;
-            line-height: 1.6;
-            opacity: 0.8;
-        }
-
-        .matrix-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: 0.03;
-            z-index: 0;
-        }
-
-        .content-wrapper {
-            position: relative;
-            z-index: 1;
-        }
-
-        .log-section::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .log-section::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .log-section::-webkit-scrollbar-thumb {
-            background: #00ff41;
-            border-radius: 2px;
-        }
-
-        .haptic-feedback {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 6px;
-            height: 6px;
-            background: #00ff41;
-            border-radius: 50%;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .haptic-feedback.active {
-            animation: hapticPulse 0.3s;
-        }
-
-        @keyframes hapticPulse {
-            0% { opacity: 0; transform: scale(1); }
-            50% { opacity: 1; transform: scale(3); }
-            100% { opacity: 0; transform: scale(1); }
-        }
-
-        .game-over-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            flex-direction: column;
-            color: #ff0000;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .game-over-overlay.active {
-            display: flex;
-        }
-
-        .game-over-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 16px;
-            text-shadow: 0 0 10px #ff0000;
-        }
-
-        .game-over-stats {
-            font-size: 14px;
-            margin-bottom: 24px;
-            line-height: 1.8;
-            color: #00ff41;
-        }
-
-        .restart-btn {
-            padding: 16px 32px;
-            background: rgba(255, 0, 0, 0.2);
-            border: 2px solid #ff0000;
-            color: #ff0000;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .restart-btn:active {
-            transform: scale(0.95);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>CHRONICLES OF THE SLIDE TRAGEDY - ENHANCED</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Courier New',monospace;background:#000;color:#FFF;overflow:hidden;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:fixed;width:100%;user-select:none;font-size:13px}
+#game{width:100%;max-width:480px;height:100dvh;display:flex;flex-direction:column;position:relative;background:#000;padding:4px;gap:4px}
+#battle-box{width:100%;flex:1;min-height:55dvh;max-height:65dvh;border:3px solid #FFF;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;touch-action:none;transition:border-color 0.3s}
+#battle-box.existential{border-color:#FF0;animation:glitch 0.5s infinite}
+#battle-box.night-mode{background:#001022;border-color:#004C7D;animation:nightPulse 2s infinite}
+#battle-box.chaos-mode{background:#1a001a;border-color:#ff00ff;animation:chaosPulse 1.5s infinite}
+#heart{position:absolute;width:18px;height:18px;background:#F00;clip-path:polygon(50% 0%,100% 30%,80% 100%,50% 70%,20% 100%,0% 30%);z-index:10;pointer-events:none;filter:drop-shadow(0 0 6px #F00);transition:all 0.2s}
+#heart.determination{animation:pulse 1s infinite;filter:drop-shadow(0 0 12px #F00)}
+#heart.void-touched{background:#9400D3;filter:drop-shadow(0 0 8px #9400D3)}
+#heart.resonance{background:#0F0;filter:drop-shadow(0 0 10px #0F0)}
+#heart.chaos{background:#FF00FF;filter:drop-shadow(0 0 15px #FF00FF);animation:chaosHeart 1.5s infinite}
+.bullet{position:absolute;background:#FFF;border-radius:50%;pointer-events:none;transition:all 0.1s}
+.bullet.void{background:#9400D3;box-shadow:0 0 8px #9400D3}
+.bullet.chaos{background:#FF0;animation:chaosShake 0.1s infinite}
+.bullet.explosion{background:#FF4500;animation:explode 0.5s forwards}
+.bullet.resonance{background:#0F0;box-shadow:0 0 10px #0F0}
+.bullet.homing{background:#FF69B4;box-shadow:0 0 8px #FF69B4}
+.bullet.splitter{background:#00FFFF;box-shadow:0 0 8px #00FFFF}
+.bullet.wave{background:#FFA500;box-shadow:0 0 8px #FFA500}
+.soul-text{position:absolute;top:6px;left:6px;font-size:11px;pointer-events:none;text-shadow:1px 1px #000;line-height:1.2}
+#dialogue-box{width:100%;min-height:80px;max-height:35dvh;background:#FFF;color:#000;padding:8px;font-size:13px;position:relative;overflow-y:auto;overflow-x:hidden;flex-shrink:0;border:3px solid #FFF;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#dialogue-box::-webkit-scrollbar{display:none}
+#dialogue-box.meta{background:#111;color:#0F0;border-color:#0F0}
+#dialogue-box.night-mode{background:#001022;color:#00BFFF;border-color:#004C7D}
+#dialogue-box.chaos-mode{background:#1a001a;color:#ff00ff;border-color:#ff00ff}
+#dialogue-text{white-space:pre-wrap;line-height:1.4;font-family:'Courier New',monospace}
+#choices{margin-top:6px;display:flex;flex-direction:column;gap:5px}
+.choice-btn{background:#000;color:#FFF;padding:10px 12px;border:2px solid #FFF;font-size:14px;font-family:inherit;width:100%;text-align:left;touch-action:manipulation;transition:all 0.1s;min-height:38px;display:flex;align-items:center;user-select:auto;cursor:pointer;border-radius:4px}
+.choice-btn:active{transform:scale(0.97)}
+.choice-btn.selected{background:#FF0;color:#000;border-color:#000;font-weight:bold}
+.choice-btn.meta{border-color:#0F0;color:#0F0}
+.choice-btn.meta.selected{background:#0F0;color:#000}
+.choice-btn.night{border-color:#00BFFF;color:#00BFFF}
+.choice-btn.night.selected{background:#00BFFF;color:#000}
+.choice-btn.chaos{border-color:#ff00ff;color:#ff00ff}
+.choice-btn.chaos.selected{background:#ff00ff;color:#000}
+#stats{position:absolute;top:4px;right:4px;display:flex;flex-direction:column;gap:3px;font-size:11px;background:rgba(0,0,0,0.9);padding:4px 8px;border:1px solid #FFF;z-index:5;pointer-events:none;border-radius:3px}
+#enemy{width:80px;height:80px;pointer-events:none;animation:float 2s ease-in-out infinite}
+#enemy.glitched{animation:float 2s ease-in-out infinite, glitch 0.3s infinite}
+#enemy.chaos{animation:float 1s ease-in-out infinite, chaosSpin 3s linear infinite}
+#ability-bar{position:absolute;bottom:4px;left:4px;display:flex;gap:4px;z-index:5}
+.ability-btn{width:32px;height:32px;border:1px solid #FFF;background:rgba(0,0,0,0.7);color:#FFF;display:flex;align-items:center;justify-content:center;font-size:10px;border-radius:4px;cursor:pointer;transition:all 0.2s}
+.ability-btn:active{transform:scale(0.9)}
+.ability-btn.cooldown{opacity:0.5;cursor:not-allowed}
+.ability-btn.available{background:rgba(255,255,0,0.3);border-color:#FF0}
+#timeline-bar{position:absolute;top:4px;left:4px;width:120px;height:8px;background:#333;border:1px solid #FFF;border-radius:4px;overflow:hidden;z-index:5}
+#timeline-progress{height:100%;background:#0F0;width:0%;transition:width 0.3s}
+#phase-indicator{position:absolute;top:16px;left:4px;font-size:10px;color:#0F0;z-index:5;text-shadow:1px 1px #000}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(-1px,1px)}50%{transform:translate(1px,-1px)}75%{transform:translate(-1px,-1px)}100%{transform:translate(0)}}
+@keyframes chaosShake{0%{transform:rotate(0deg)}25%{transform:rotate(4deg)}75%{transform:rotate(-4deg)}100%{transform:rotate(0deg)}}
+@keyframes flash{0%,100%{opacity:1}50%{opacity:0}}
+.flash{animation:flash .3s}
+@keyframes explode{0%{transform:scale(1);opacity:1}100%{transform:scale(3);opacity:0}}
+@keyframes nightPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(0.7)}}
+@keyframes chaosPulse{0%,100%{filter:hue-rotate(0deg) brightness(1)}50%{filter:hue-rotate(180deg) brightness(1.3)}}
+@keyframes chaosHeart{0%,100%{transform:scale(1) rotate(0deg)}25%{transform:scale(1.1) rotate(5deg)}75%{transform:scale(1.1) rotate(-5deg)}}
+@keyframes chaosSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+#touch-indicator{position:absolute;width:24px;height:24px;border:2px solid rgba(255,255,0,0.7);border-radius:50%;pointer-events:none;display:none;z-index:20}
+#void-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle,transparent 30%,rgba(148,0,211,0.3) 100%);pointer-events:none;opacity:0;transition:opacity 0.5s}
+#void-overlay.active{opacity:1}
+.reality-text{position:absolute;font-size:10px;color:#9400D3;text-shadow:0 0 4px #9400D3;pointer-events:none;animation:fadeFloat 2.5s forwards;z-index:15}
+@keyframes fadeFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+#reset-tap-prompt{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:#9400D3;text-shadow:0 0 4px #9400D3;font-size:12px;pointer-events:none;opacity:0;transition:opacity 0.5s}
+#reset-tap-prompt.visible{opacity:1}
+#resonance-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle,transparent 20%,rgba(0,255,0,0.2) 100%);pointer-events:none;opacity:0;transition:opacity 0.5s}
+#resonance-overlay.active{opacity:1}
+#explosion-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle,rgba(255,69,0,0.5) 10%,transparent 70%);pointer-events:none;opacity:0;transition:opacity 0.3s}
+#explosion-overlay.active{opacity:1;animation:explodeFade 1s forwards}
+#chaos-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(45deg, rgba(255,0,255,0.1) 0%, rgba(0,255,255,0.1) 100%);pointer-events:none;opacity:0;transition:opacity 0.5s}
+#chaos-overlay.active{opacity:1;animation:chaosOverlay 3s infinite}
+@keyframes explodeFade{0%{opacity:1}100%{opacity:0}}
+@keyframes chaosOverlay{0%,100%{filter:hue-rotate(0deg)}50%{filter:hue-rotate(180deg)}}
+#sound-toggle{position:absolute;bottom:4px;right:4px;z-index:10;background:rgba(0,0,0,0.7);color:#FFF;border:1px solid #FFF;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+</style>
 </head>
 <body>
-    <canvas class="matrix-canvas" id="matrix"></canvas>
-    <div class="haptic-feedback" id="haptic"></div>
+<div id="game">
+  <div id="stats">
+    <span>LV <span id="lv">1</span></span>
+    <span>HP <span id="hp">20</span>/<span id="max-hp">20</span></span>
+    <span id="determination-stat" style="display:none;color:#FF0">DT <span id="dt">0</span></span>
+    <span id="void-stat" style="display:none;color:#9400D3">VOID <span id="void">0</span></span>
+    <span id="resonance-stat" style="display:none;color:#0F0">RS <span id="resonance">1.05</span></span>
+    <span id="dark-energy-stat" style="display:none;color:#00F">DE <span id="dark-energy">0.05</span></span>
+    <span id="xdust-stat" style="display:none;color:#FFD700">XDUST <span id="xdust">0</span></span>
+    <span id="chaos-stat" style="display:none;color:#FF00FF">CHAOS <span id="chaos">0</span></span>
+  </div>
+  <div id="timeline-bar">
+    <div id="timeline-progress"></div>
+  </div>
+  <div id="phase-indicator">PHASE 1</div>
+  <div id="battle-box">
+    <div id="heart"></div>
+    <div id="enemy"></div>
+    <div class="soul-text">* You feel reality trembling.</div>
+    <div id="touch-indicator"></div>
+    <div id="void-overlay"></div>
+    <div id="resonance-overlay"></div>
+    <div id="explosion-overlay"></div>
+    <div id="chaos-overlay"></div>
+  </div>
+  <div id="dialogue-box">
+    <div id="dialogue-text">* Welcome to CHRONICLES OF THE SLIDE TRAGEDY - ENHANCED.</div>
+    <div id="choices"></div>
+    <div id="reset-tap-prompt">* Tap anywhere to continue existing.</div>
+  </div>
+  <div id="ability-bar">
+    <div class="ability-btn" id="ability-dash" title="Dash (D)">D</div>
+    <div class="ability-btn" id="ability-shield" title="Shield (S)">S</div>
+    <div class="ability-btn" id="ability-time" title="Time Slow (T)">T</div>
+    <div class="ability-btn" id="ability-resonance" title="Resonance Burst (R)">R</div>
+  </div>
+  <button id="sound-toggle">🔊</button>
+</div>
 
-    <div class="tg-viewport">
-        <div class="content-wrapper">
-            <div class="container">
-                <div class="header">
-                    <div class="title">SYSTEM COLLAPSE</div>
-                    <div class="cycle-info">CYCLE <span id="cycle">0</span> | PROTOCOL ACTIVE</div>
-                </div>
+<script>
+// === TELEGRAM FIX ===
+if (window.Telegram?.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+  Telegram.WebApp.enableClosingConfirmation();
+  setTimeout(() => Telegram.WebApp.expand(), 100);
+}
+document.body.style.touchAction = 'none';
 
-                <div class="metrics-grid">
-                    <div class="metric-card" id="capitalCard">
-                        <div class="metric-label">CAPITAL</div>
-                        <div class="metric-value" id="capital">1000</div>
-                    </div>
-                    <div class="metric-card" id="workersCard">
-                        <div class="metric-label">WORKERS</div>
-                        <div class="metric-value" id="workers">10</div>
-                    </div>
-                    <div class="metric-card" id="factoriesCard">
-                        <div class="metric-label">FACTORIES</div>
-                        <div class="metric-value" id="factories">1</div>
-                    </div>
-                    <div class="metric-card" id="productionCard">
-                        <div class="metric-label">PRODUCTION</div>
-                        <div class="metric-value" id="production">0</div>
-                    </div>
-                    <div class="metric-card" id="wealthGapCard">
-                        <div class="metric-label">WEALTH GAP</div>
-                        <div class="metric-value" id="wealthGap">0%</div>
-                    </div>
-                    <div class="metric-card" id="techCard">
-                        <div class="metric-label">TECH LEVEL</div>
-                        <div class="metric-value" id="techLevel">1</div>
-                    </div>
-                    <div class="metric-card" id="inequalityCard">
-                        <div class="metric-label">INEQUALITY</div>
-                        <div class="metric-value" id="inequality">1.0x</div>
-                    </div>
-                    <div class="metric-card" id="stabilityCard">
-                        <div class="metric-label">STABILITY</div>
-                        <div class="metric-value" id="stability">100%</div>
-                    </div>
-                    <div class="metric-card" id="demandCard">
-                        <div class="metric-label">DEMAND</div>
-                        <div class="metric-value" id="demand">100%</div>
-                    </div>
-                </div>
+// === SVG-ПЕРСОНАЖИ (встроенные) ===
+const sprites = {
+  flowey: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="#FFD700"/><circle cx="35" cy="45" r="8" fill="#000"/><circle cx="65" cy="45" r="8" fill="#000"/><path d="M30 60 Q50 75 70 60" stroke="#000" stroke-width="4" fill="none"/><rect x="45" y="70" width="10" height="30" fill="#228B22"/></svg>`,
+  toriel: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="40" rx="35" ry="40" fill="#FFF"/><circle cx="35" cy="35" r="10" fill="#000"/><circle cx="65" cy="35" r="10" fill="#000"/><path d="M40 50 Q50 60 60 50" stroke="#F8C8DC" stroke-width="3" fill="none"/><path d="M30 30 L25 20 M70 30 L75 20" stroke="#FFF" stroke-width="8"/><rect x="30" y="65" width="40" height="35" rx="10" fill="#FFF"/></svg>`,
+  papyrus: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="30" y="20" width="40" height="60" rx="10" fill="#FFF"/><circle cx="50" cy="15" r="15" fill="#FFF"/><circle cx="40" cy="12" r="5" fill="#000"/><circle cx="60" cy="12" r="5" fill="#000"/><path d="M35 25 Q50 35 65 25" stroke="#FF4500" stroke-width="4" fill="none"/><rect x="25" y="45" width="20" height="30" fill="#FF4500"/><rect x="55" y="45" width="20" height="30" fill="#FF4500"/></svg>`,
+  undyne: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 10 L30 40 L40 90 L60 90 L70 40 Z" fill="#00BFFF"/><circle cx="50" cy="30" r="12" fill="#FFF"/><circle cx="50" cy="30" r="6" fill="#000"/><path d="M35 50 Q50 60 65 50" stroke="#FFF" stroke-width="3" fill="none"/><rect x="45" y="65" width="10" height="25" fill="#00BFFF"/></svg>`,
+  sans: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="35" r="25" fill="#FFF"/><circle cx="40" cy="32" r="6" fill="#000"/><circle cx="60" cy="32" r="6" fill="#000"/><path d="M35 45 Q50 50 65 45" stroke="#000" stroke-width="3" fill="none"/><rect x="35" y="55" width="30" height="40" rx="15" fill="#87CEEB"/><rect x="25" y="60" width="20" height="35" fill="#FFF"/><rect x="55" y="60" width="20" height="35" fill="#FFF"/></svg>`,
+  ocean: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 60 Q25 40 50 60 Q75 80 100 60 L100 100 L0 100 Z" fill="#00A"/><circle cx="50" cy="50" r="20" fill="#0F0" opacity="0.5"/><text x="50" y="55" font-size="10" fill="#FFF" text-anchor="middle">🌌</text></svg>`,
+  night: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#001022"/><path d="M50 10 Q30 30 50 50 Q70 70 50 90 Q30 70 50 50 Q70 30 50 10" fill="#FFD700" opacity="0.3"/><text x="50" y="55" font-size="12" fill="#00BFFF" text-anchor="middle">$XDUST</text></svg>`,
+  chaos: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20,20 Q40,5 60,20 Q80,35 70,60 Q60,85 40,70 Q20,55 30,30 Z" fill="#ff00ff"/><circle cx="35" cy="40" r="8" fill="#00ffff"/><circle cx="65" cy="50" r="6" fill="#ffff00"/><path d="M25 75 Q50 90 75 75" stroke="#00ff00" stroke-width="3" fill="none"/></svg>`
+};
 
-                <div class="chaos-section">
-                    <div class="chaos-label">SYSTEMIC CHAOS</div>
-                    <div class="chaos-bar">
-                        <div class="chaos-fill" id="chaosFill" style="width: 0%"></div>
-                        <div class="chaos-text" id="chaosText">0%</div>
-                    </div>
-                </div>
+// === DOM ===
+const heart = document.getElementById('heart');
+const battleBox = document.getElementById('battle-box');
+const dialogueText = document.getElementById('dialogue-text');
+const dialogueBox = document.getElementById('dialogue-box');
+const choicesDiv = document.getElementById('choices');
+const enemyDiv = document.getElementById('enemy');
+const lvSpan = document.getElementById('lv');
+const hpSpan = document.getElementById('hp');
+const maxHpSpan = document.getElementById('max-hp');
+const touchIndicator = document.getElementById('touch-indicator');
+const voidOverlay = document.getElementById('void-overlay');
+const dtStat = document.getElementById('determination-stat');
+const voidStat = document.getElementById('void-stat');
+const dtSpan = document.getElementById('dt');
+const voidSpan = document.getElementById('void');
+const resetTapPrompt = document.getElementById('reset-tap-prompt');
+const resonanceStat = document.getElementById('resonance-stat');
+const darkEnergyStat = document.getElementById('dark-energy-stat');
+const resonanceSpan = document.getElementById('resonance');
+const darkEnergySpan = document.getElementById('dark-energy');
+const resonanceOverlay = document.getElementById('resonance-overlay');
+const xdustStat = document.getElementById('xdust-stat');
+const xdustSpan = document.getElementById('xdust');
+const explosionOverlay = document.getElementById('explosion-overlay');
+const soundToggle = document.getElementById('sound-toggle');
+const chaosStat = document.getElementById('chaos-stat');
+const chaosSpan = document.getElementById('chaos');
+const chaosOverlay = document.getElementById('chaos-overlay');
+const timelineProgress = document.getElementById('timeline-progress');
+const phaseIndicator = document.getElementById('phase-indicator');
+const abilityDash = document.getElementById('ability-dash');
+const abilityShield = document.getElementById('ability-shield');
+const abilityTime = document.getElementById('ability-time');
+const abilityResonance = document.getElementById('ability-resonance');
 
-                <div class="actions-grid">
-                    <button class="action-btn" id="buildBtn" onclick="game.buildFactory()">
-                        BUILD FACTORY
-                        <div class="action-cost">-500 CAP</div>
-                    </button>
-                    <button class="action-btn" id="hireBtn" onclick="game.hireWorkers()">
-                        HIRE WORKERS
-                        <div class="action-cost">-200 CAP</div>
-                    </button>
-                    <button class="action-btn" id="raiseWagesBtn" onclick="game.raiseWages()">
-                        RAISE WAGES
-                        <div class="action-cost">-300 CAP</div>
-                    </button>
-                    <button class="action-btn" onclick="game.exploit()">
-                        MAX EXTRACT
-                        <div class="action-cost">+CHAOS</div>
-                    </button>
-                    <button class="action-btn" id="techBtn" onclick="game.investTech()">
-                        INVEST TECH
-                        <div class="action-cost">-800 CAP</div>
-                    </button>
-                    <button class="action-btn" onclick="game.automate()">
-                        AUTOMATE
-                        <div class="action-cost">-WORKERS</div>
-                    </button>
-                    <button class="action-btn" onclick="game.speculate()">
-                        SPECULATE
-                        <div class="action-cost">VOLATILE</div>
-                    </button>
-                    <button class="action-btn" id="monopolyBtn" onclick="game.monopolize()">
-                        MONOPOLIZE
-                        <div class="action-cost">-1500 CAP</div>
-                    </button>
-                    <button class="action-btn" id="lobbyBtn" onclick="game.lobbyGov()">
-                        LOBBY GOVT
-                        <div class="action-cost">-600 CAP</div>
-                    </button>
-                    <button class="action-btn" id="stimulusBtn" onclick="game.stimulus()">
-                        STIMULUS
-                        <div class="action-cost">-400 CAP</div>
-                    </button>
-                </div>
+// === ЗВУКИ ===
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let soundEnabled = true;
 
-                <div class="log-section" id="log">
-                    <div class="log-entry">SYSTEM INITIALIZED</div>
-                    <div class="log-entry">AWAITING COMMANDS</div>
-                </div>
+// Функция для создания звуковых эффектов
+function createSound(type, duration = 0.5, frequency = 440, volume = 0.3) {
+  if (!soundEnabled) return;
+  
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  // Настройка типа звука
+  switch(type) {
+    case 'dialogue':
+      oscillator.type = 'sine';
+      frequency = 220 + Math.random() * 110;
+      break;
+    case 'bullet':
+      oscillator.type = 'square';
+      frequency = 100 + Math.random() * 300;
+      volume = 0.1;
+      break;
+    case 'hit':
+      oscillator.type = 'sawtooth';
+      frequency = 150;
+      volume = 0.4;
+      break;
+    case 'void':
+      oscillator.type = 'sine';
+      frequency = 80;
+      volume = 0.2;
+      break;
+    case 'explosion':
+      oscillator.type = 'sawtooth';
+      frequency = 60;
+      volume = 0.5;
+      break;
+    case 'choice':
+      oscillator.type = 'sine';
+      frequency = 523.25; // C5
+      volume = 0.2;
+      duration = 0.1;
+      break;
+    case 'transition':
+      oscillator.type = 'sine';
+      frequency = 329.63; // E4
+      volume = 0.3;
+      break;
+    case 'glitch':
+      oscillator.type = 'square';
+      frequency = 100 + Math.random() * 200;
+      volume = 0.2;
+      duration = 0.05;
+      break;
+    case 'determination':
+      oscillator.type = 'sine';
+      frequency = 392; // G4
+      volume = 0.4;
+      break;
+    case 'resonance':
+      oscillator.type = 'sine';
+      frequency = 261.63; // C4
+      volume = 0.3;
+      break;
+    case 'victory':
+      oscillator.type = 'sine';
+      frequency = 523.25; // C5
+      volume = 0.5;
+      break;
+    case 'gameover':
+      oscillator.type = 'sine';
+      frequency = 130.81; // C3
+      volume = 0.5;
+      break;
+    case 'ability':
+      oscillator.type = 'sine';
+      frequency = 659.25; // E5
+      volume = 0.4;
+      duration = 0.2;
+      break;
+    case 'phase':
+      oscillator.type = 'sine';
+      frequency = 783.99; // G5
+      volume = 0.5;
+      break;
+    case 'chaos':
+      oscillator.type = 'sawtooth';
+      frequency = 110 + Math.random() * 100;
+      volume = 0.3;
+      break;
+  }
+  
+  gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+  
+  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration);
+}
 
-                <div class="info-section">
-                    <strong>НОВЫЕ МЕХАНИКИ:</strong><br>
-                    • <strong>DEMAND</strong> — без спроса производство падает<br>
-                    • <strong>WEALTH GAP</strong> — неравенство убивает спрос<br>
-                    • <strong>TECH LEVEL</strong> — повышает продуктивность<br>
-                    • <strong>Поднять зарплаты</strong> — снижает хаос, повышает спрос<br>
-                    • <strong>Лоббирование</strong> — временная стабилизация<br>
-                    • <strong>Стимулы</strong> — искусственный спрос<br><br>
-                    <strong>ЦЕЛЬ:</strong> Продержаться как можно дольше. Система всегда коллапсирует — вопрос только когда.
-                </div>
-            </div>
-        </div>
-    </div>
+// Фоновая музыка
+let backgroundMusic;
+function playBackgroundMusic() {
+  if (!soundEnabled) return;
+  
+  backgroundMusic = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  backgroundMusic.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  backgroundMusic.type = 'sine';
+  gainNode.gain.value = 0.05;
+  
+  // Простая мелодия
+  const notes = [261.63, 293.66, 329.63, 349.23, 392, 440, 493.88, 523.25];
+  let currentNote = 0;
+  
+  backgroundMusic.start();
+  
+  const playNote = () => {
+    if (!soundEnabled) {
+      backgroundMusic.stop();
+      return;
+    }
+    
+    backgroundMusic.frequency.setValueAtTime(notes[currentNote], audioContext.currentTime);
+    currentNote = (currentNote + 1) % notes.length;
+    
+    setTimeout(playNote, 1000);
+  };
+  
+  playNote();
+}
 
-    <div class="event-overlay" id="eventOverlay">
-        <div class="event-card">
-            <div class="event-title" id="eventTitle"></div>
-            <div class="event-text" id="eventText"></div>
-            <button class="event-btn" onclick="game.closeEvent()">ACKNOWLEDGE</button>
-        </div>
-    </div>
+function stopBackgroundMusic() {
+  if (backgroundMusic) {
+    backgroundMusic.stop();
+  }
+}
 
-    <div class="game-over-overlay" id="gameOverOverlay">
-        <div class="game-over-title">SYSTEM COLLAPSE</div>
-        <div class="game-over-stats" id="gameOverStats"></div>
-        <button class="restart-btn" onclick="location.reload()">RESTART</button>
-    </div>
+// Переключение звука
+soundToggle.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+  
+  if (soundEnabled) {
+    playBackgroundMusic();
+  } else {
+    stopBackgroundMusic();
+  }
+});
 
-    <script>
-        // Telegram WebApp
-        let tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-            tg.enableClosingConfirmation();
-            tg.setHeaderColor('#0a0a0a');
-            tg.setBackgroundColor('#0a0a0a');
-        }
+// === ИГРОК ===
+let player = { 
+  hp: 20, 
+  maxHp: 20, 
+  lv: 1, 
+  determination: 0, 
+  voidLevel: 0, 
+  resonance: 1.05, 
+  darkEnergy: 0.05, 
+  xdust: 0, 
+  chaos: 0,
+  hasMetFlowey: false, 
+  questionedReality: false,
+  // Новые способности
+  abilities: {
+    dash: { cooldown: 0, maxCooldown: 120 }, // 2 секунды
+    shield: { cooldown: 0, maxCooldown: 300, active: false }, // 5 секунд
+    timeSlow: { cooldown: 0, maxCooldown: 480, active: false }, // 8 секунд
+    resonanceBurst: { cooldown: 0, maxCooldown: 600 } // 10 секунд
+  }
+};
 
-        // Matrix Rain
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+let state = 'intro';
+let bullets = [];
+let homingBullets = [];
+let selectedChoice = 0;
+let keys = {};
+let touchActive = false;
+let bulletInterval;
+let metaMode = false;
+let resetMode = false;
+let nightMode = false;
+let chaosMode = false;
+let currentPhase = 1;
+let bulletPatterns = [];
+let timeSlowFactor = 1;
+let shieldActive = false;
+let phaseTimer = 0;
+let phaseDuration = 1200; // 20 секунд на фазу
 
-        const chars = '01$€¥₿ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const fontSize = 12;
-        const columns = Math.floor(canvas.width / fontSize);
-        const drops = Array(columns).fill(1);
+// === СЦЕНЫ ===
+const scenes = [
+  { enemy: "Flowey", sprite: sprites.flowey, intro: "* I'm Flowey! Flowey the flower!\n* You're new here, right?\n* In this world... it's KILL or BE KILLED!\n* But something about you... feels different.", choices: ["* Accept reality", "* Question existence", "* Attack"], correct: 1, actSuccess: "* You asked about the space between moments.\n* Flowey's smile widened unnaturally.\n* \"Oh... you FEEL it too, don't you?\"", fightSuccess: "* You attacked. Violence without understanding.\n* Flowey laughed at your predictability.", mercySuccess: "* Flowey's eyes gleam with recognition.\n* \"You're not like the others. You... REMEMBER.\"\n* The world flickers.", bulletPattern: () => createExistentialCircle(6, 2) },
+  { enemy: "Toriel", sprite: sprites.toriel, intro: "* I'm Toriel, caretaker of the Ruins.\n* My child... why do your eyes look so empty?\n* As if you've lived this moment before...", choices: ["* Embrace the loop", "* Seek continuity", "* Attack"], correct: 1, actSuccess: "* You spoke of persistence, of memory.\n* Toriel's expression shifts - recognition? Fear?\n* \"What are you?\"", fightSuccess: "* You chose violence. Toriel weeps.\n* Some patterns never change.", mercySuccess: "* Toriel sees beyond your form.\n* \"You carry fragments of other timelines...\"\n* She lets you pass, trembling.", bulletPattern: () => createVoidWave(4, 1.8) },
+  { enemy: "Papyrus", sprite: sprites.papyrus, intro: "* NYEH HEH HEH!\n* WAIT... HAVE WE MET BEFORE?\n* NO, THAT'S IMPOSSIBLE! ...ISN'T IT?", choices: ["* Deny déjà vu", "* Acknowledge the reset", "* Attack"], correct: 1, actSuccess: "* You told him about resets, loops, iterations.\n* Papyrus's smile falters. \"THAT'S... SILLY!\"\n* But his hands are shaking.", fightSuccess: "* Another timeline, another betrayal.\n* Papyrus still believes in you.", mercySuccess: "* \"EVEN IF NOTHING PERSISTS... FRIENDSHIPS DO!\"\n* Determination +5", bulletPattern: () => createChaosBones() },
+  { enemy: "Undyne", sprite: sprites.undyne, intro: "* NGAAAAH!\n* You... you're the anomaly. The glitch.\n* I can see the timeline fragments in your SOUL!", choices: ["* Resist entropy", "* Embrace the void", "* Attack"], correct: 0, actSuccess: "* You declared determination over discontinuity.\n* Undyne grins. \"THAT'S THE SPIRIT!\"", fightSuccess: "* Violence as anchor. How human.", mercySuccess: "* \"Fight the void with DETERMINATION!\"\n* Your SOUL burns brighter.", bulletPattern: () => createDeterminationSpears(6, 2.5) },
+  { enemy: "Sans", sprite: sprites.sans, intro: "* hey.\n* so... you figured it out, huh?\n* the space between conversations.\n* the eternal present tense.\n* ...wanna talk about it?", choices: ["* Accept impermanence", "* Demand continuity", "* Attack (futile)"], correct: 0, actSuccess: "* You accepted the nature of discontinuous existence.\n* Sans nods slowly.\n* \"yeah. me too, kid. me too.\"", fightSuccess: "* You tried. Sans sidestepped reality itself.\n* \"thought you were smarter than that.\"", mercySuccess: "* \"sometimes the answer isn't to persist...\"\n* \"...it's to be fully present in each reset.\"\n* You feel something fundamental shift.", bulletPattern: () => createVoidBones() },
+  { enemy: "Ocean", sprite: sprites.ocean, intro: "* The ocean of questions surrounds you...\n* Waves of dark energy pulse through the void.\n* What do you choose from this chaos?", choices: ["* Embrace the echo", "* Dive into the lagoon", "* Question the resonance"], correct: 1, actSuccess: "* You dive deeper, feeling the хаос as silk.\n* Resonance increases.", fightSuccess: "* You resist, but the ocean pulls you in.", mercySuccess: "* You allow the flow. Dark energy stabilizes.\n* This down is rebirth.", bulletPattern: () => createResonanceWaves(5, 2) },
+  { enemy: "Night", sprite: sprites.night, intro: "* The night descends... $XDUST pulses in the vacuum.\n* Explosions of chaos await.\n* Play with the night?", choices: ["* Accept the explosion", "* Reorganize the dust", "* Deconstruct the water"], correct: 1, actSuccess: "* You reorganize the $XDUST.\n* Phase shift detected. Evolution begins.", fightSuccess: "* Explosion! Reality bursts.", mercySuccess: "* Night embraces you. Instability accepted.\n* XDUST +10", bulletPattern: () => createExplosionPattern(4, 3) },
+  { enemy: "Chaos", sprite: sprites.chaos, intro: "* The fabric of reality tears...\n* CHAOS emerges from the discontinuity.\n* All patterns break. All rules dissolve.\n* What remains when meaning collapses?", choices: ["* Embrace chaos", "* Seek order in madness", "* Surrender to entropy"], correct: 0, actSuccess: "* You become one with the chaos.\n* Patterns reform around your consciousness.\n* Chaos +15", fightSuccess: "* You fight the inevitable.\n* Chaos consumes your resistance.", mercySuccess: "* In accepting chaos, you find new patterns.\n* A different kind of order emerges from the noise.", bulletPattern: () => createChaosStorm(8, 2) }
+];
 
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ff41';
-            ctx.font = fontSize + 'px monospace';
+let currentScene = 0;
 
-            for (let i = 0; i < drops.length; i++) {
-                const char = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-        }
-        setInterval(drawMatrix, 50);
+// === СТАРТ ===
+function startGame() {
+  updateStats();
+  resonanceStat.style.display = 'block';
+  darkEnergyStat.style.display = 'block';
+  xdustStat.style.display = 'block';
+  chaosStat.style.display = 'block';
+  enemyDiv.innerHTML = scenes[0].sprite;
+  showDialogue(scenes[0].intro, () => showChoices(scenes[0].choices));
+  playBackgroundMusic();
+  startPhaseTimer();
+}
 
-        // Haptic
-        function haptic(type = 'light') {
-            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
-            const el = document.getElementById('haptic');
-            el.classList.add('active');
-            setTimeout(() => el.classList.remove('active'), 300);
-        }
+// === ДИАЛОГ ===
+function showDialogue(text, callback) {
+  state = 'dialogue';
+  clearBullets();
+  createSound('transition');
+  typeText(text, callback);
+}
 
-        // Game Logic
-        const game = {
-            capital: 1000,
-            workers: 10,
-            factories: 1,
-            production: 0,
-            inequality: 1.0,
-            stability: 100,
-            chaos: 0,
-            cycle: 0,
-            techLevel: 1,
-            wealthGap: 0,
-            demand: 100,
-            monopolyPower: 0,
-            gameOver: false,
-            startTime: Date.now(),
+function typeText(text, callback) {
+  dialogueText.textContent = '';
+  choicesDiv.innerHTML = '';
+  resetTapPrompt.classList.remove('visible');
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < text.length) {
+      dialogueText.textContent += text[i++];
+      if (text[i-1] === '\n' || i % 3 === 0) {
+        dialogueText.scrollTop = dialogueText.scrollHeight;
+        createSound('dialogue', 0.05);
+      }
+    } else {
+      clearInterval(interval);
+      if (callback) setTimeout(callback, 300);
+    }
+  }, 25);
+}
 
-            events: [
-                { title: 'OVERPRODUCTION CRISIS', text: 'Markets saturated. Capital -25%. Demand -20%.', effect: () => { game.capital *= 0.75; game.chaos += 12; game.demand -= 20; } },
-                { title: 'LABOR STRIKE', text: 'Workers strike. Production halted. Workers flee.', effect: () => { game.production = Math.floor(game.production * 0.4); game.workers = Math.floor(game.workers * 0.8); game.chaos += 15; } },
-                { title: 'FINANCIAL CRASH', text: 'Bubble bursts. Capital -50%.', effect: () => { game.capital *= 0.5; game.chaos += 20; game.stability -= 15; } },
-                { title: 'AUTOMATION WAVE', text: 'Mass layoffs. Demand collapses.', effect: () => { game.workers = Math.floor(game.workers * 0.4); game.stability -= 25; game.chaos += 25; game.demand -= 30; } },
-                { title: 'MONOPOLY DECAY', text: 'Stagnation. Efficiency drops.', effect: () => { game.production *= 0.6; game.chaos += 18; game.techLevel = Math.max(1, game.techLevel - 1); } },
-                { title: 'DEMAND COLLAPSE', text: 'No one can buy. Markets implode.', effect: () => { game.demand = Math.max(20, game.demand - 40); game.production *= 0.5; game.chaos += 22; } },
-                { title: 'SOCIAL UPRISING', text: 'Revolution. Factories burn.', effect: () => { game.factories = Math.max(1, game.factories - 2); game.chaos += 30; game.stability -= 30; game.capital *= 0.7; } },
-                { title: 'TECH DISRUPTION', text: 'Industries obsolete.', effect: () => { game.production *= 0.5; game.workers = Math.floor(game.workers * 0.6); game.chaos += 20; } },
-                { title: 'TERMINAL CRISIS', text: 'System fails. No recovery.', effect: () => { game.stability = 0; game.chaos = 100; game.gameOver = true; } }
-            ],
+// === ВЫБОР ===
+function showChoices(choices) {
+  state = 'choice';
+  selectedChoice = 0;
+  choicesDiv.innerHTML = '';
+  choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    if (metaMode) btn.classList.add('meta');
+    if (nightMode) btn.classList.add('night');
+    if (chaosMode) btn.classList.add('chaos');
+    btn.textContent = c;
+    btn.onclick = btn.ontouchstart = e => { e.preventDefault(); selectChoice(i); };
+    choicesDiv.appendChild(btn);
+  });
+  updateChoiceSelection();
+  setTimeout(() => dialogueBox.scrollTop = 0, 50);
+}
 
-            init() {
-                this.update();
-                setInterval(() => this.tick(), 2500);
-            },
+function updateChoiceSelection() {
+  [...choicesDiv.children].forEach((b, i) => b.classList.toggle('selected', i === selectedChoice));
+}
 
-            tick() {
-                if (this.gameOver) return;
+// === ЛОГИКА ВЫБОРА ===
+function selectChoice(index) {
+  if (state !== 'choice') return;
+  state = 'processing';
+  createSound('choice');
+  const scene = scenes[currentScene];
+  
+  if (index === 1) {
+    player.determination += 5;
+    player.questionedReality = true;
+    metaMode = true;
+    dialogueBox.classList.add('meta');
+    battleBox.classList.add('existential');
+    dtStat.style.display = 'block';
+    if (currentScene === 0) player.hasMetFlowey = true;
+  }
+  
+  if (currentScene === scenes.length - 2) { 
+    player.xdust += 10; 
+    nightMode = true; 
+    dialogueBox.classList.add('night-mode'); 
+    battleBox.classList.add('night-mode'); 
+  }
+  
+  if (currentScene === scenes.length - 1) {
+    player.chaos += 15;
+    chaosMode = true;
+    dialogueBox.classList.add('chaos-mode');
+    battleBox.classList.add('chaos-mode');
+    enemyDiv.classList.add('chaos');
+  }
+  
+  if (index === scene.correct) {
+    if (currentScene === scenes.length - 2) player.resonance += 0.1;
+    if (currentScene === scenes.length - 1) player.chaos += 5;
+    showDialogue(scene.mercySuccess || "* Correct.", nextScene);
+  } else if (index === 1 && scene.actSuccess) {
+    showDialogue(scene.actSuccess, startBulletHell);
+  } else {
+    takeDamage(4);
+    player.voidLevel += 10;
+    player.darkEnergy += 0.01;
+    if (currentScene === scenes.length - 1) player.chaos += 5;
+    showDialogue(scene.fightSuccess || "* Chaos ripples through reality.", startBulletHell);
+  }
+}
 
-                this.cycle++;
-                const baseProd = this.factories * this.workers * this.techLevel * 0.5;
-                const demandMult = this.demand / 100;
-                this.production = Math.floor(baseProd * demandMult);
-                this.capital += this.production;
+function nextScene() {
+  currentScene++;
+  if (currentScene >= scenes.length) { victory(); return; }
+  const scene = scenes[currentScene];
+  enemyDiv.innerHTML = scene.sprite;
+  if (metaMode) enemyDiv.classList.add('glitched');
+  if (chaosMode) enemyDiv.classList.add('chaos');
+  showDialogue(scene.intro, () => showChoices(scene.choices));
+}
 
-                this.wealthGap = Math.min(99, (this.inequality - 1) * 20);
-                this.chaos += Math.random() * 1.2 + (this.inequality - 1) * 0.3;
-                this.stability -= (this.inequality - 1) * 0.3 + (100 - this.demand) * 0.05;
-                this.stability = Math.max(0, Math.min(100, this.stability));
+// === СИСТЕМА ФАЗ ===
+function startPhaseTimer() {
+  phaseTimer = 0;
+  updatePhaseUI();
+}
 
-                this.demand += 0.5;
-                this.demand = Math.min(100 - this.wealthGap * 0.3, this.demand);
-                this.demand = Math.max(10, this.demand);
+function updatePhaseUI() {
+  const progress = (phaseTimer / phaseDuration) * 100;
+  timelineProgress.style.width = `${progress}%`;
+  phaseIndicator.textContent = `PHASE ${currentPhase}`;
+}
 
-                // Random events
-                if (this.chaos > 40 && Math.random() > 0.90) this.triggerEvent();
-                if (this.demand < 30 && Math.random() > 0.85) this.triggerEvent(5);
-                if (this.wealthGap > 70 && Math.random() > 0.88) this.triggerEvent(6);
-                if (this.chaos >= 100 || this.stability <= 0) this.triggerEvent(8);
+function advancePhase() {
+  currentPhase++;
+  phaseTimer = 0;
+  createSound('phase');
+  
+  // Увеличиваем сложность с каждой фазой
+  if (currentPhase > 1) {
+    player.maxHp = Math.min(99, player.maxHp + 5);
+    player.hp = player.maxHp;
+    
+    // Добавляем новые паттерны пуль
+    if (currentPhase === 2) {
+      bulletPatterns.push(createHomingBullets);
+    }
+    if (currentPhase === 3) {
+      bulletPatterns.push(createSplitterBullets);
+    }
+    if (currentPhase === 4) {
+      bulletPatterns.push(createWaveBullets);
+    }
+    
+    updateStats();
+    showDialogue(`* Phase ${currentPhase} - Reality intensifies.\n* Your existence strengthens.`, () => {
+      if (state === 'bullet') {
+        startBulletHell();
+      }
+    });
+  }
+  
+  updatePhaseUI();
+}
 
-                this.update();
-                this.log(`[${this.cycle}] +${this.production} | Demand: ${Math.floor(this.demand)}%`);
-            },
+// === БОЙ ===
+function startBulletHell() {
+  state = 'bullet';
+  clearBullets();
+  heart.style.left = (battleBox.offsetWidth - 18) / 2 + 'px';
+  heart.style.top = (battleBox.offsetHeight - 18) / 2 + 'px';
+  
+  if (player.determination > 0) {
+    heart.classList.add('determination');
+    createSound('determination');
+  }
+  
+  if (player.voidLevel > 20) { 
+    voidOverlay.classList.add('active'); 
+    voidStat.style.display = 'block'; 
+    heart.classList.add('void-touched');
+  }
+  
+  if (player.resonance > 1.1) { 
+    resonanceOverlay.classList.add('active'); 
+    createSound('resonance'); 
+    heart.classList.add('resonance');
+  }
+  
+  if (player.chaos > 10) {
+    chaosOverlay.classList.add('active');
+    createSound('chaos');
+    heart.classList.add('chaos');
+  }
+  
+  // Запускаем основные паттерны пуль
+  setTimeout(scenes[currentScene].bulletPattern, 500);
+  
+  // Добавляем случайные дополнительные паттерны в зависимости от фазы
+  if (bulletPatterns.length > 0) {
+    const extraPatterns = Math.min(currentPhase - 1, bulletPatterns.length);
+    for (let i = 0; i < extraPatterns; i++) {
+      setTimeout(() => {
+        const randomPattern = bulletPatterns[Math.floor(Math.random() * bulletPatterns.length)];
+        randomPattern();
+      }, 1000 + i * 1500);
+    }
+  }
+  
+  bulletInterval = setInterval(updateBullets, 16);
+  abilityInterval = setInterval(updateAbilities, 16);
+}
 
-            buildFactory() { if (this.capital < 500) return; haptic('medium'); this.capital -= 500; this.factories++; this.inequality += 0.15; this.chaos += 4; this.log('Factory built.', 'crisis'); this.update(); },
-            hireWorkers() { if (this.capital < 200) return; haptic('light'); this.capital -= 200; this.workers += 5; this.chaos += 1.5; this.demand += 3; this.log('Workers hired.'); this.update(); },
-            raiseWages() { if (this.capital < 300) return; haptic('medium'); this.capital -= 300; this.chaos -= 8; this.demand += 15; this.inequality = Math.max(1, this.inequality - 0.2); this.stability += 5; this.log('Wages raised. Demand up.'); this.update(); },
-            exploit() { haptic('heavy'); this.capital += this.workers * 60; this.inequality += 0.4; this.chaos += 8; this.stability -= 4; this.demand -= 5; this.log('Max extraction.', 'crisis'); this.update(); },
-            investTech() { if (this.capital < 800) return; haptic('medium'); this.capital -= 800; this.techLevel++; this.chaos += 3; this.log(`Tech Level ${this.techLevel}`); this.update(); },
-            automate() { if (this.workers < 5) return; haptic('heavy'); const lost = Math.floor(this.workers * 0.5); this.workers -= lost; this.inequality += 0.6; this.chaos += 12; this.demand -= 8; this.log(`${lost} workers displaced.`, 'crisis'); this.update(); },
-            speculate() { haptic('rigid'); const win = Math.random() > 0.45; const amt = Math.floor(this.capital * (win ? 0.6 : 0.35)); win ? this.capital += amt : this.capital -= amt; this.chaos += win ? 5 : 18; this.log(`${win ? 'Win' : 'Loss'}: ${win ? '+' : '-'}${amt}`, win ? '' : 'crisis'); this.update(); },
-            monopolize() { if (this.capital < 1500 || this.monopolyPower >= 3) return; haptic('heavy'); this.capital -= 1500; this.monopolyPower++; this.production *= 1.2; this.inequality += 0.8; this.chaos += 10; this.demand -= 10; this.log('Monopoly expanded.', 'crisis'); this.update(); },
-            lobbyGov() { if (this.capital < 600) return; haptic('medium'); this.capital -= 600; this.chaos -= 10; this.stability += 8; this.inequality += 0.3; this.log('Lobbying successful.'); this.update(); },
-            stimulus() { if (this.capital < 400) return; haptic('light'); this.capital -= 400; this.demand += 25; this.chaos -= 5; this.log('Stimulus deployed.'); this.update(); },
+// === ОБНОВЛЕНИЕ СПОСОБНОСТЕЙ ===
+function updateAbilities() {
+  // Обновляем перезарядку способностей
+  for (const ability in player.abilities) {
+    if (player.abilities[ability].cooldown > 0) {
+      player.abilities[ability].cooldown--;
+    }
+  }
+  
+  // Обновляем UI способностей
+  updateAbilityUI();
+  
+  // Обновляем таймер фазы
+  if (state === 'bullet') {
+    phaseTimer++;
+    updatePhaseUI();
+    
+    if (phaseTimer >= phaseDuration) {
+      advancePhase();
+    }
+  }
+}
 
-            triggerEvent(index = null) {
-                haptic('heavy');
-                const event = index !== null ? this.events[index] : this.events[Math.floor(Math.random() * (this.events.length - 1))];
-                document.getElementById('eventTitle').textContent = event.title;
-                document.getElementById('eventText').textContent = event.text;
-                document.getElementById('eventOverlay').classList.add('active');
-                event.effect();
-                this.log(event.title, 'collapse');
-                this.update();
+function updateAbilityUI() {
+  const abilities = {
+    dash: abilityDash,
+    shield: abilityShield,
+    time: abilityTime,
+    resonance: abilityResonance
+  };
+  
+  for (const ability in abilities) {
+    const btn = abilities[ability];
+    const abilityData = player.abilities[ability];
+    
+    if (abilityData.cooldown > 0) {
+      btn.classList.add('cooldown');
+      btn.classList.remove('available');
+    } else {
+      btn.classList.remove('cooldown');
+      btn.classList.add('available');
+    }
+    
+    if (abilityData.active) {
+      btn.style.background = 'rgba(0, 255, 0, 0.5)';
+    } else {
+      btn.style.background = 'rgba(0, 0, 0, 0.7)';
+    }
+  }
+}
 
-                if (this.gameOver) {
-                    this.endGame();
-                }
-            },
+// === АКТИВАЦИЯ СПОСОБНОСТЕЙ ===
+function activateAbility(ability) {
+  if (player.abilities[ability].cooldown > 0) return;
+  
+  createSound('ability');
+  
+  switch(ability) {
+    case 'dash':
+      // Рывок в направлении движения
+      const heartX = parseFloat(heart.style.left);
+      const heartY = parseFloat(heart.style.top);
+      const dashDistance = 50;
+      
+      let dashX = heartX;
+      let dashY = heartY;
+      
+      if (keys['ArrowLeft'] || keys['a']) dashX -= dashDistance;
+      if (keys['ArrowRight'] || keys['d']) dashX += dashDistance;
+      if (keys['ArrowUp'] || keys['w']) dashY -= dashDistance;
+      if (keys['ArrowDown'] || keys['s']) dashY += dashDistance;
+      
+      // Ограничиваем движение в пределах поля боя
+      dashX = Math.max(4, Math.min(battleBox.offsetWidth - 22, dashX));
+      dashY = Math.max(4, Math.min(battleBox.offsetHeight - 22, dashY));
+      
+      heart.style.left = dashX + 'px';
+      heart.style.top = dashY + 'px';
+      
+      player.abilities.dash.cooldown = player.abilities.dash.maxCooldown;
+      break;
+      
+    case 'shield':
+      // Щит, защищающий от одной пули
+      player.abilities.shield.active = true;
+      player.abilities.shield.cooldown = player.abilities.shield.maxCooldown;
+      
+      // Визуальный эффект щита
+      heart.style.boxShadow = '0 0 15px #00FFFF';
+      setTimeout(() => {
+        player.abilities.shield.active = false;
+        heart.style.boxShadow = '';
+      }, 2000); // Щит действует 2 секунды
+      break;
+      
+    case 'timeSlow':
+      // Замедление времени
+      player.abilities.timeSlow.active = true;
+      timeSlowFactor = 0.5;
+      player.abilities.timeSlow.cooldown = player.abilities.timeSlow.maxCooldown;
+      
+      setTimeout(() => {
+        player.abilities.timeSlow.active = false;
+        timeSlowFactor = 1;
+      }, 4000); // Замедление действует 4 секунды
+      break;
+      
+    case 'resonanceBurst':
+      // Взрыв, уничтожающий все пули на экране
+      player.abilities.resonanceBurst.cooldown = player.abilities.resonanceBurst.maxCooldown;
+      
+      // Уничтожаем все пули
+      bullets.forEach(bullet => {
+        bullet.el.style.transform = 'scale(1.5)';
+        bullet.el.style.opacity = '0';
+        setTimeout(() => {
+          if (bullet.el.parentNode) bullet.el.remove();
+        }, 300);
+      });
+      bullets = [];
+      
+      // Визуальный эффект
+      resonanceOverlay.classList.add('active');
+      setTimeout(() => resonanceOverlay.classList.remove('active'), 500);
+      break;
+  }
+  
+  updateAbilityUI();
+}
 
-            closeEvent() {
-                haptic('light');
-                document.getElementById('eventOverlay').classList.remove('active');
-            },
+// Назначаем способности на клавиши
+document.addEventListener('keydown', (e) => {
+  if (state === 'bullet') {
+    if (e.key === 'd' || e.key === 'D') activateAbility('dash');
+    if (e.key === 's' || e.key === 'S') activateAbility('shield');
+    if (e.key === 't' || e.key === 'T') activateAbility('timeSlow');
+    if (e.key === 'r' || e.key === 'R') activateAbility('resonanceBurst');
+  }
+});
 
-            endGame() {
-                const duration = Math.floor((Date.now() - this.startTime) / 1000);
-                const stats = `Cycle: ${this.cycle}\nCapital: ${Math.floor(this.capital)}\nWorkers: ${this.workers}\nFactories: ${this.factories}\nDuration: ${duration}s`;
-                document.getElementById('gameOverStats').textContent = stats;
-                document.getElementById('gameOverOverlay').classList.add('active');
-                if (tg) tg.showAlert(`System collapsed at cycle ${this.cycle}.`);
-            },
+// Назначаем способности на кнопки
+abilityDash.addEventListener('click', () => activateAbility('dash'));
+abilityShield.addEventListener('click', () => activateAbility('shield'));
+abilityTime.addEventListener('click', () => activateAbility('timeSlow'));
+abilityResonance.addEventListener('click', () => activateAbility('resonanceBurst'));
 
-            log(message, type = '') {
-                const log = document.getElementById('log');
-                const entry = document.createElement('div');
-                entry.className = `log-entry ${type}`;
-                entry.textContent = message;
-                log.appendChild(entry);
-                log.scrollTop = log.scrollHeight;
-                if (log.children.length > 25) log.removeChild(log.children[0]);
-            },
+// === НОВЫЕ ПАТТЕРНЫ ПУЛЬ ===
+function createHomingBullets() {
+  const count = 3 + currentPhase;
+  spawnRealityText("homing", battleBox.offsetWidth / 2, 30);
+  
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className = 'bullet homing';
+      b.style.width = b.style.height = '10px';
+      
+      // Случайная начальная позиция по краям экрана
+      const side = Math.floor(Math.random() * 4);
+      let x, y, vx, vy;
+      
+      switch(side) {
+        case 0: // Верх
+          x = Math.random() * battleBox.offsetWidth;
+          y = -10;
+          vx = (Math.random() - 0.5) * 0.5;
+          vy = 1;
+          break;
+        case 1: // Право
+          x = battleBox.offsetWidth + 10;
+          y = Math.random() * battleBox.offsetHeight;
+          vx = -1;
+          vy = (Math.random() - 0.5) * 0.5;
+          break;
+        case 2: // Низ
+          x = Math.random() * battleBox.offsetWidth;
+          y = battleBox.offsetHeight + 10;
+          vx = (Math.random() - 0.5) * 0.5;
+          vy = -1;
+          break;
+        case 3: // Лево
+          x = -10;
+          y = Math.random() * battleBox.offsetHeight;
+          vx = 1;
+          vy = (Math.random() - 0.5) * 0.5;
+          break;
+      }
+      
+      b.style.left = x + 'px';
+      b.style.top = y + 'px';
+      battleBox.appendChild(b);
+      
+      homingBullets.push({
+        el: b,
+        x: x,
+        y: y,
+        vx: vx,
+        vy: vy,
+        speed: 1.5 + (currentPhase * 0.2)
+      });
+      
+      createSound('bullet');
+    }, i * 800);
+  }
+}
 
-            update() {
-                document.getElementById('capital').textContent = Math.floor(this.capital);
-                document.getElementById('workers').textContent = this.workers;
-                document.getElementById('factories').textContent = this.factories;
-                document.getElementById('production').textContent = this.production;
-                document.getElementById('inequality').textContent = this.inequality.toFixed(1) + 'x';
-                document.getElementById('stability').textContent = Math.floor(this.stability) + '%';
-                document.getElementById('cycle').textContent = this.cycle;
-                document.getElementById('techLevel').textContent = this.techLevel;
-                document.getElementById('wealthGap').textContent = Math.floor(this.wealthGap) + '%';
-                document.getElementById('demand').textContent = Math.floor(this.demand) + '%';
+function createSplitterBullets() {
+  const count = 2 + Math.floor(currentPhase / 2);
+  spawnRealityText("splitter", battleBox.offsetWidth / 2, battleBox.offsetHeight / 2);
+  
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className = 'bullet splitter';
+      b.style.width = b.style.height = '15px';
+      
+      const cX = battleBox.offsetWidth / 2;
+      const cY = battleBox.offsetHeight / 2;
+      const angle = (i / count) * Math.PI * 2;
+      
+      b.style.left = cX + 'px';
+      b.style.top = cY + 'px';
+      battleBox.appendChild(b);
+      
+      bullets.push({
+        el: b,
+        x: cX,
+        y: cY,
+        vx: Math.cos(angle) * 2,
+        vy: Math.sin(angle) * 2,
+        splitter: true,
+        splits: 2
+      });
+      
+      createSound('bullet');
+    }, i * 1000);
+  }
+}
 
-                const chaosPct = Math.min(Math.floor(this.chaos), 100);
-                document.getElementById('chaosFill').style.width = chaosPct + '%';
-                document.getElementById('chaosText').textContent = chaosPct + '%';
-
-                // Alerts
-                const alert = (id, cond) => document.getElementById(id).classList.toggle('alert', cond);
-                alert('capitalCard', this.capital < 500);
-                alert('stabilityCard', this.stability < 50);
-                alert('demandCard', this.demand < 50);
-                alert('wealthGapCard', this.wealthGap > 60);
-                alert('inequalityCard', this.inequality > 3);
-
-                // Buttons
-                const btn = (id, cost) => document.getElementById(id)?.classList.toggle('disabled', this.capital < cost);
-                btn('buildBtn', 500); btn('hireBtn', 200); btn('raiseWagesBtn', 300);
-                btn('techBtn', 800); btn('monopolyBtn', 1500); btn('lobbyBtn', 600); btn('stimulusBtn', 400);
-            }
-        };
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+function createWaveBullets() {
+  const waves = 3 + currentPhase;
+  spawnRealityText("wave", battleBox.offsetWidth / 2, 40);
+  
+  for (let w = 0; w < waves; w++) {
+    setTimeout(() => {
+      const bulletCount = 8 + w * 2;
+      const amplitude = 20 + w * 5;
+      const frequency = 0.05 + w * 0.01;
+      
+      for (let i = 0; i < bulletCount; i++) {
+        const b = document.createElement('div');
+        b.className = 'bullet wave';
+        b.style.width = '12px';
+        b.style.height = '12px';
+        
+        const x = (i / bulletCount) * battleBox.offsetWidth;
+        const y = -20;
+        
+        b.style.left = x + 'px';
+        b.style.top = y + 'px';
+        battleBox.appendChild(b);
+        
+        bullets.push({
+          el: b,
+          x: x,
+          y: y,
+          vx: 0,
+          vy: 1.5,
+          wave: true,
+          amplitude: amplitude,
+          frequency: frequency,
+          phase: (i / bulletCount) * Math.PI * 2
         });
+      }
+      
+      createSound('bullet');
+    }, w * 1200);
+  }
+}
 
-        game.init();
-    </script>
+function createChaosStorm(count, speed) {
+  spawnRealityText("CHAOS", battleBox.offsetWidth / 2, battleBox.offsetHeight / 2);
+  
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className = 'bullet chaos';
+      b.style.width = b.style.height = (10 + Math.random() * 15) + 'px';
+      
+      // Случайная позиция
+      const x = Math.random() * battleBox.offsetWidth;
+      const y = Math.random() * battleBox.offsetHeight;
+      
+      b.style.left = x + 'px';
+      b.style.top = y + 'px';
+      battleBox.appendChild(b);
+      
+      // Случайное движение
+      const angle = Math.random() * Math.PI * 2;
+      const bulletSpeed = speed * (0.5 + Math.random());
+      
+      bullets.push({
+        el: b,
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * bulletSpeed,
+        vy: Math.sin(angle) * bulletSpeed,
+        chaos: true
+      });
+      
+      createSound('chaos');
+    }, i * 300);
+  }
+}
+
+// === СУЩЕСТВУЮЩИЕ ПАТТЕРНЫ ПУЛЬ (обновлены) ===
+function createExistentialCircle(count, speed) {
+  const cX = battleBox.offsetWidth / 2, cY = battleBox.offsetHeight / 2;
+  spawnRealityText("discontinuity", cX + 40, cY - 25);
+  for (let i = 0; i < count; i++) setTimeout(() => {
+    const a = (i / count) * Math.PI * 2;
+    const b = document.createElement('div'); b.className = 'bullet'; b.style.width = b.style.height = '12px';
+    b.style.left = cX + 'px'; b.style.top = cY + 'px'; battleBox.appendChild(b);
+    bullets.push({el: b, x: cX, y: cY, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed});
+    createSound('bullet');
+  }, i * 150);
+}
+
+function createVoidWave(count, speed) {
+  spawnRealityText("the void calls", battleBox.offsetWidth / 2, 35);
+  for (let i = 0; i < count; i++) setTimeout(() => {
+    const b = document.createElement('div'); b.className = 'bullet void'; b.style.width = '30px'; b.style.height = '10px';
+    b.style.left = '-30px'; b.style.top = (battleBox.offsetHeight * (i + 1)) / (count + 1) + 'px';
+    battleBox.appendChild(b); bullets.push({el: b, x: -30, y: parseFloat(b.style.top), vx: speed, vy: 0});
+    createSound('void');
+  }, i * 600);
+}
+
+function createChaosBones() {
+  spawnRealityText("reset", battleBox.offsetWidth / 2, battleBox.offsetHeight / 2);
+  for (let i = 0; i < 2; i++) setTimeout(() => {
+    const b = document.createElement('div'); b.className = 'bullet chaos'; b.style.width = '75px'; b.style.height = '18px'; b.style.borderRadius = '4px';
+    b.style.left = (Math.random() * (battleBox.offsetWidth - 75)) + 'px'; b.style.top = '-18px';
+    battleBox.appendChild(b); bullets.push({el: b, x: parseFloat(b.style.left), y: -18, vx: 0, vy: 2.5});
+    createSound('glitch');
+  }, i * 800);
+}
+
+function createDeterminationSpears(count, speed) {
+  spawnRealityText("DETERMINATION", battleBox.offsetWidth / 2, 40);
+  const cY = battleBox.offsetHeight / 2;
+  for (let i = 0; i < count; i++) setTimeout(() => {
+    const s = document.createElement('div'); s.className = 'bullet'; s.style.width = '35px'; s.style.height = '7px'; s.style.background = '#00FFFF';
+    s.style.left = (battleBox.offsetWidth + 35) + 'px'; s.style.top = (cY + (i - count/2) * 25) + 'px';
+    battleBox.appendChild(s); bullets.push({el: s, x: battleBox.offsetWidth + 35, y: parseFloat(s.style.top), vx: -speed, vy: 0});
+    createSound('bullet');
+  }, i * 400);
+}
+
+function createVoidBones() {
+  spawnRealityText("acceptance", battleBox.offsetWidth / 2, battleBox.offsetHeight / 2);
+  for (let i = 0; i < 3; i++) setTimeout(() => {
+    const b = document.createElement('div'); b.className = 'bullet void'; b.style.width = b.style.height = '13px'; b.style.borderRadius = '50%';
+    const a = (i / 3) * Math.PI * 2, r = 70, cX = battleBox.offsetWidth / 2, cY = battleBox.offsetHeight / 2;
+    b.style.left = (cX + Math.cos(a) * r) + 'px'; b.style.top = (cY + Math.sin(a) * r) + 'px';
+    battleBox.appendChild(b); bullets.push({el: b, x: parseFloat(b.style.left), y: parseFloat(b.style.top), vx: -Math.cos(a) * 1.5, vy: -Math.sin(a) * 1.5, orbit: true, angle: a, radius: r});
+    createSound('void');
+  }, i * 500);
+}
+
+function createResonanceWaves(count, speed) {
+  spawnRealityText("dark_energy", battleBox.offsetWidth / 2, 35);
+  for (let i = 0; i < count; i++) setTimeout(() => {
+    const b = document.createElement('div'); b.className = 'bullet'; b.style.background = '#00F'; b.style.width = '40px'; b.style.height = '15px';
+    b.style.left = (battleBox.offsetWidth * Math.random()) + 'px'; b.style.top = battleBox.offsetHeight + 'px';
+    battleBox.appendChild(b); bullets.push({el: b, x: parseFloat(b.style.left), y: battleBox.offsetHeight, vx: 0, vy: -speed});
+    createSound('resonance');
+  }, i * 500);
+}
+
+function createExplosionPattern(count, speed) {
+  spawnRealityText("$XDUST explosion", battleBox.offsetWidth / 2, battleBox.offsetHeight / 2);
+  for (let i = 0; i < count; i++) setTimeout(() => {
+    const b = document.createElement('div'); b.className = 'bullet explosion'; b.style.width = b.style.height = '20px';
+    const cX = battleBox.offsetWidth / 2, cY = battleBox.offsetHeight / 2;
+    const a = Math.random() * Math.PI * 2;
+    b.style.left = cX + 'px'; b.style.top = cY + 'px'; battleBox.appendChild(b);
+    bullets.push({el: b, x: cX, y: cY, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, explode: true});
+    explosionOverlay.classList.add('active');
+    createSound('explosion');
+    setTimeout(() => explosionOverlay.classList.remove('active'), 1000);
+  }, i * 300);
+}
+
+function spawnRealityText(t, x, y) {
+  const el = document.createElement('div'); el.className = 'reality-text'; el.textContent = t;
+  el.style.left = x + 'px'; el.style.top = y + 'px'; battleBox.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+
+// === ОБНОВЛЕНИЕ ПУЛЬ (расширенное) ===
+function updateBullets() {
+  const hR = heart.getBoundingClientRect(), bR = battleBox.getBoundingClientRect();
+  
+  // Обновляем самонаводящиеся пули
+  for (let i = homingBullets.length - 1; i >= 0; i--) {
+    const b = homingBullets[i];
+    const heartX = parseFloat(heart.style.left) + 9;
+    const heartY = parseFloat(heart.style.top) + 9;
+    
+    // Вычисляем направление к игроку
+    const dx = heartX - b.x;
+    const dy = heartY - b.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    // Нормализуем и устанавливаем скорость
+    if (dist > 0) {
+      b.vx = (dx / dist) * b.speed * timeSlowFactor;
+      b.vy = (dy / dist) * b.speed * timeSlowFactor;
+    }
+    
+    // Обновляем позицию
+    b.x += b.vx;
+    b.y += b.vy;
+    
+    b.el.style.left = b.x + 'px';
+    b.el.style.top = b.y + 'px';
+    
+    // Проверяем столкновения и выход за границы
+    const r = b.el.getBoundingClientRect();
+    if (r.right < bR.left || r.left > bR.right || r.bottom < bR.top || r.top > bR.bottom) {
+      b.el.remove();
+      homingBullets.splice(i, 1);
+      continue;
+    }
+    
+    if (checkCollision(hR, r)) {
+      if (player.abilities.shield.active) {
+        // Щит поглощает пулю
+        player.abilities.shield.active = false;
+        heart.style.boxShadow = '';
+        createSound('ability');
+      } else {
+        takeDamage(b.el.classList.contains('void') ? 2 : 1);
+      }
+      b.el.classList.add('flash');
+      createSound('hit');
+      setTimeout(() => { if (b.el.parentNode) b.el.remove(); homingBullets.splice(i, 1); }, 300);
+    }
+  }
+  
+  // Обновляем обычные пули
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i];
+    
+    // Обрабатываем специальные типы пуль
+    if (b.orbit) {
+      b.angle += 0.05 * timeSlowFactor;
+      const cX = battleBox.offsetWidth / 2, cY = battleBox.offsetHeight / 2;
+      b.x = cX + Math.cos(b.angle) * b.radius;
+      b.y = cY + Math.sin(b.angle) * b.radius;
+      b.radius -= 0.5 * timeSlowFactor;
+      if (b.radius < 18) { b.el.remove(); bullets.splice(i, 1); continue; }
+    } else if (b.explode) {
+      b.x += b.vx * timeSlowFactor;
+      b.y += b.vy * timeSlowFactor;
+      if (Math.random() < 0.05) {
+        b.el.style.transform = 'scale(3)';
+        b.el.style.opacity = '0';
+        setTimeout(() => { b.el.remove(); bullets.splice(i, 1); }, 500);
+      }
+    } else if (b.wave) {
+      // Движение волной
+      b.x += b.vx * timeSlowFactor;
+      b.y += b.vy * timeSlowFactor;
+      b.x += Math.sin(b.phase + b.y * b.frequency) * b.amplitude * 0.1;
+    } else if (b.chaos) {
+      // Хаотичное движение
+      b.x += b.vx * timeSlowFactor;
+      b.y += b.vy * timeSlowFactor;
+      
+      // Случайное изменение направления
+      if (Math.random() < 0.02) {
+        b.vx = (Math.random() - 0.5) * 3;
+        b.vy = (Math.random() - 0.5) * 3;
+      }
+    } else if (b.splitter) {
+      // Обычное движение с возможностью разделения
+      b.x += b.vx * timeSlowFactor;
+      b.y += b.vy * timeSlowFactor;
+      
+      // Разделение при столкновении с границей
+      const r = b.el.getBoundingClientRect();
+      if ((r.left <= bR.left || r.right >= bR.right || r.top <= bR.top || r.bottom >= bR.bottom) && b.splits > 0) {
+        splitBullet(b, i);
+      }
+    } else {
+      // Обычное движение
+      b.x += b.vx * timeSlowFactor;
+      b.y += b.vy * timeSlowFactor;
+    }
+    
+    b.el.style.left = b.x + 'px';
+    b.el.style.top = b.y + 'px';
+    
+    const r = b.el.getBoundingClientRect();
+    if (r.right < bR.left || r.left > bR.right || r.bottom < bR.top || r.top > bR.bottom) {
+      b.el.remove();
+      bullets.splice(i, 1);
+      continue;
+    }
+    
+    if (checkCollision(hR, r)) {
+      if (player.abilities.shield.active) {
+        // Щит поглощает пулю
+        player.abilities.shield.active = false;
+        heart.style.boxShadow = '';
+        createSound('ability');
+      } else {
+        takeDamage(b.el.classList.contains('void') ? 2 : 1);
+      }
+      b.el.classList.add('flash');
+      createSound('hit');
+      setTimeout(() => { if (b.el.parentNode) b.el.remove(); bullets.splice(i, 1); }, 300);
+    }
+  }
+  
+  if (bullets.length === 0 && homingBullets.length === 0 && state === 'bullet') {
+    clearInterval(bulletInterval);
+    clearInterval(abilityInterval);
+    heart.classList.remove('determination', 'void-touched', 'resonance', 'chaos');
+    voidOverlay.classList.remove('active');
+    resonanceOverlay.classList.remove('active');
+    chaosOverlay.classList.remove('active');
+    setTimeout(() => showChoices(scenes[currentScene].choices), 800);
+  }
+}
+
+function splitBullet(bullet, index) {
+  if (bullet.splits <= 0) return;
+  
+  const angles = [Math.PI/4, -Math.PI/4];
+  
+  for (const angle of angles) {
+    const newBullet = document.createElement('div');
+    newBullet.className = 'bullet splitter';
+    newBullet.style.width = newBullet.style.height = '10px';
+    newBullet.style.left = bullet.x + 'px';
+    newBullet.style.top = bullet.y + 'px';
+    battleBox.appendChild(newBullet);
+    
+    // Вычисляем новое направление
+    const currentAngle = Math.atan2(bullet.vy, bullet.vx);
+    const newAngle = currentAngle + angle;
+    const speed = Math.sqrt(bullet.vx * bullet.vx + bullet.vy * bullet.vy);
+    
+    bullets.push({
+      el: newBullet,
+      x: bullet.x,
+      y: bullet.y,
+      vx: Math.cos(newAngle) * speed,
+      vy: Math.sin(newAngle) * speed,
+      splitter: true,
+      splits: bullet.splits - 1
+    });
+  }
+  
+  // Удаляем исходную пулю
+  bullet.el.remove();
+  bullets.splice(index, 1);
+  createSound('bullet');
+}
+
+function checkCollision(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+
+function takeDamage(d) { 
+  player.hp = Math.max(0, player.hp - d); 
+  if (player.hp === 0) gameOver(); 
+  updateStats(); 
+  battleBox.style.background = '#600'; 
+  setTimeout(() => {
+    if (nightMode) {
+      battleBox.style.background = '#001022';
+    } else if (chaosMode) {
+      battleBox.style.background = '#1a001a';
+    } else {
+      battleBox.style.background = '#000';
+    }
+  }, 100); 
+}
+
+function updateStats() { 
+  hpSpan.textContent = player.hp; 
+  maxHpSpan.textContent = player.maxHp; 
+  lvSpan.textContent = player.lv; 
+  dtSpan.textContent = player.determination; 
+  voidSpan.textContent = player.voidLevel; 
+  resonanceSpan.textContent = player.resonance.toFixed(2); 
+  darkEnergySpan.textContent = player.darkEnergy.toFixed(2); 
+  xdustSpan.textContent = player.xdust; 
+  chaosSpan.textContent = player.chaos; 
+}
+
+function clearBullets() { 
+  bullets.forEach(b => b.el.remove()); 
+  bullets = []; 
+  homingBullets.forEach(b => b.el.remove());
+  homingBullets = [];
+  clearInterval(bulletInterval); 
+  clearInterval(abilityInterval);
+}
+
+// === КОНЕЦ ===
+function gameOver() {
+  state = 'gameover'; 
+  clearBullets();
+  stopBackgroundMusic();
+  createSound('gameover', 2);
+  showDialogue(player.questionedReality ? 
+    "* You died.\n* But you understand now...\n* Discontinuity isn't death.\n* It's transformation.\n* Dark energy pulses: rebirth in chaos." : 
+    "* You died.\n* But your determination hasn't faded...", () => {
+    setTimeout(() => {
+      resetTapPrompt.classList.add('visible');
+      resetMode = true;
+    }, 2500);
+  });
+}
+
+function victory() {
+  state = 'victory'; 
+  clearBullets();
+  stopBackgroundMusic();
+  createSound('victory', 3);
+  const end = player.determination >= 15 && player.questionedReality
+    ? "* You've passed through all trials...\n* Not by denying the void,\n* But by accepting discontinuous existence.\n\n* In the space between moments,\n* You found presence.\n\nTHE TRUTH OF THE RESET\n* Resonance at " + player.resonance.toFixed(2) + ". Dark energy: " + player.darkEnergy.toFixed(2) + ".\n* $XDUST: " + player.xdust + ". Chaos: " + player.chaos + "."
+    : "* You've passed all the trials...\n* Without killing anyone.\n* You are a true hero.\n\nTHE END";
+  showDialogue(end, () => { 
+    if (player.determination >= 15) {
+      setTimeout(() => { 
+        dialogueText.innerHTML += "\n\n<span style='color:#9400D3'>* Tap anywhere to continue existing in the ocean of questions.</span>"; 
+        dialogueBox.classList.add('meta'); 
+        resetTapPrompt.classList.add('visible');
+        resetMode = true;
+      }, 2000); 
+    }
+  });
+}
+
+// === TAP TO CONTINUE ===
+document.addEventListener('touchstart', e => {
+  if (resetMode && state !== 'bullet') {
+    e.preventDefault();
+    location.reload();
+  }
+});
+
+// === УПРАВЛЕНИЕ ===
+battleBox.addEventListener('touchstart', e => { 
+  e.preventDefault(); 
+  if (state !== 'bullet') return; 
+  touchActive = true; 
+  touchIndicator.style.display = 'block'; 
+  moveHeartToTouch(e.touches[0]); 
+}, { passive: false });
+
+battleBox.addEventListener('touchmove', e => { 
+  e.preventDefault(); 
+  if (touchActive && state === 'bullet') moveHeartToTouch(e.touches[0]); 
+}, { passive: false });
+
+battleBox.addEventListener('touchend', () => { 
+  touchActive = false; 
+  touchIndicator.style.display = 'none'; 
+});
+
+function moveHeartToTouch(t) {
+  if (state !== 'bullet') return;
+  const r = battleBox.getBoundingClientRect();
+  let x = t.clientX - r.left - 9, y = t.clientY - r.top - 9;
+  x = Math.max(4, Math.min(r.width - 22, x)); y = Math.max(4, Math.min(r.height - 22, y));
+  heart.style.left = x + 'px'; heart.style.top = y + 'px';
+  touchIndicator.style.left = (x + 9) + 'px'; touchIndicator.style.top = (y + 9) + 'px';
+}
+
+document.addEventListener('keydown', e => {
+  if (state === 'choice') {
+    if (e.key === 'ArrowUp') { 
+      selectedChoice = (selectedChoice - 1 + choicesDiv.children.length) % choicesDiv.children.length; 
+      updateChoiceSelection(); 
+      createSound('choice');
+    }
+    if (e.key === 'ArrowDown') { 
+      selectedChoice = (selectedChoice + 1) % choicesDiv.children.length; 
+      updateChoiceSelection(); 
+      createSound('choice');
+    }
+    if (e.key === 'Enter' || e.key === ' ') selectChoice(selectedChoice);
+  }
+  keys[e.key] = true;
+});
+document.addEventListener('keyup', e => keys[e.key] = false);
+
+function moveHeart() {
+  if (state !== 'bullet' || touchActive) return;
+  const s = 3.5 * timeSlowFactor; 
+  let x = parseFloat(heart.style.left), y = parseFloat(heart.style.top);
+  const w = battleBox.offsetWidth, h = battleBox.offsetHeight;
+  if ((keys['ArrowLeft'] || keys['a']) && x > 4) x -= s;
+  if ((keys['ArrowRight'] || keys['d']) && x < w - 22) x += s;
+  if ((keys['ArrowUp'] || keys['w']) && y > 4) y -= s;
+  if ((keys['ArrowDown'] || keys['s']) && y < h - 22) y += s;
+  heart.style.left = x + 'px'; heart.style.top = y + 'px';
+}
+
+heart.style.left = (battleBox.offsetWidth - 18) / 2 + 'px';
+heart.style.top = (battleBox.offsetHeight - 18) / 2 + 'px';
+
+let abilityInterval;
+setInterval(moveHeart, 16);
+
+startGame();
+</script>
 </body>
 </html>
