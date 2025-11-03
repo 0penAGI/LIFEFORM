@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,705 +14,725 @@
             user-select: none;
         }
 
-```
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: #0a0a0a;
-        color: #00ff41;
-        overflow-x: hidden;
-        touch-action: pan-y;
-        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-        min-height: 100vh;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            touch-action: pan-y;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            min-height: 100vh;
+        }
 
-    .tg-viewport {
-        width: 100vw;
-        min-height: 100vh;
-    }
+        .tg-viewport {
+            width: 100vw;
+            min-height: 100vh;
+        }
 
-    .container {
-        padding: 12px;
-        padding-bottom: 80px;
-    }
+        .container {
+            padding: 12px;
+            padding-bottom: 80px;
+        }
 
-    .header {
-        background: rgba(0, 255, 65, 0.05);
-        border: 1px solid #00ff41;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 12px;
-        text-align: center;
-    }
+        .header {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid #00ff41;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
 
-    .title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 6px;
-        text-shadow: 0 0 8px #00ff41;
-    }
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-shadow: 0 0 8px #00ff41;
+        }
 
-    .cycle-info {
-        font-size: 12px;
-        opacity: 0.7;
-    }
+        .cycle-info {
+            font-size: 12px;
+            opacity: 0.7;
+        }
 
-    .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        margin-bottom: 12px;
-    }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
 
-    .metric-card {
-        background: rgba(0, 0, 0, 0.8);
-        border: 1px solid #00ff41;
-        border-radius: 10px;
-        padding: 12px;
-        position: relative;
-        overflow: hidden;
-    }
+        .metric-card {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 255, 65, 0.1);
+        }
 
-    .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 1px;
-        background: #00ff41;
-        animation: scan 2s linear infinite;
-    }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: #00ff41;
+            animation: scan 2s linear infinite;
+        }
 
-    @keyframes scan {
-        0%, 100% { transform: translateX(-100%); }
-        50% { transform: translateX(100%); }
-    }
+        @keyframes scan {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
 
-    .metric-label {
-        font-size: 10px;
-        opacity: 0.6;
-        margin-bottom: 4px;
-        letter-spacing: 1px;
-    }
+        .metric-label {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
 
-    .metric-value {
-        font-size: 24px;
-        font-weight: bold;
-    }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-    .metric-card.alert {
-        border-color: #ff0000;
-        color: #ff0000;
-        animation: pulse 1s infinite;
-    }
+        .metric-card.alert {
+            border-color: #ff0000;
+            color: #ff0000;
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+        }
 
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.6; }
-    }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
 
-    .chaos-section {
-        background: rgba(255, 0, 0, 0.05);
-        border: 1px solid #ff0000;
-        border-radius: 12px;
-        padding: 14px;
-        margin-bottom: 12px;
-    }
+        .chaos-section {
+            background: rgba(255, 0, 0, 0.05);
+            border: 1px solid #ff0000;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
 
-    .chaos-label {
-        font-size: 11px;
-        color: #ff0000;
-        margin-bottom: 8px;
-        text-align: center;
-    }
+        .chaos-label {
+            font-size: 11px;
+            color: #ff0000;
+            margin-bottom: 8px;
+            text-align: center;
+        }
 
-    .chaos-bar {
-        width: 100%;
-        height: 24px;
-        background: #1a1a1a;
-        border-radius: 12px;
-        overflow: hidden;
-        position: relative;
-    }
+        .chaos-bar {
+            width: 100%;
+            height: 24px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
 
-    .chaos-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #ff0000, #ff00ff);
-        transition: width 0.4s ease;
-        box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
-        border-radius: 12px;
-    }
+        .chaos-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff00ff);
+            transition: width 0.4s ease;
+            box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
+            border-radius: 12px;
+        }
 
-    .chaos-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 12px;
-        font-weight: bold;
-        color: #fff;
-        text-shadow: 0 0 4px #000;
-    }
+        .chaos-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 4px #000;
+        }
 
-    .actions-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        margin-bottom: 12px;
-    }
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
 
-    .action-btn {
-        background: rgba(0, 255, 65, 0.1);
-        border: 1.5px solid #00ff41;
-        color: #00ff41;
-        border-radius: 10px;
-        padding: 14px 10px;
-        font-size: 13px;
-        font-weight: 600;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        position: relative;
-        overflow: hidden;
-    }
+        .action-btn {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1.5px solid #00ff41;
+            color: #00ff41;
+            border-radius: 10px;
+            padding: 14px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .action-btn:active {
-        transform: scale(0.96);
-        background: rgba(0, 255, 65, 0.2);
-    }
+        .action-btn:active {
+            transform: scale(0.96);
+            background: rgba(0, 255, 65, 0.2);
+        }
 
-    .action-cost {
-        font-size: 10px;
-        opacity: 0.7;
-        margin-top: 4px;
-    }
+        .action-cost {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
 
-    .action-btn.disabled {
-        opacity: 0.3;
-        pointer-events: none;
-    }
+        .action-btn.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            border-color: #555;
+            color: #555;
+        }
 
-    .log-section {
-        background: rgba(0, 0, 0, 0.9);
-        border: 1px solid #00ff41;
-        border-radius: 10px;
-        padding: 12px;
-        max-height: 140px;
-        overflow-y: auto;
-        margin-bottom: 12px;
-    }
+        .log-section {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 12px;
+            max-height: 140px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
 
-    .log-entry {
-        font-size: 11px;
-        margin-bottom: 6px;
-        line-height: 1.4;
-        opacity: 0;
-        animation: fadeIn 0.4s forwards;
-    }
+        .log-entry {
+            font-size: 11px;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            opacity: 0;
+            animation: fadeIn 0.4s forwards;
+        }
 
-    @keyframes fadeIn {
-        to { opacity: 1; }
-    }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
 
-    .log-entry.crisis {
-        color: #ff6b6b;
-    }
+        .log-entry.crisis {
+            color: #ff6b6b;
+        }
 
-    .log-entry.collapse {
-        color: #ff00ff;
-        font-weight: bold;
-    }
+        .log-entry.collapse {
+            color: #ff00ff;
+            font-weight: bold;
+        }
 
-    .event-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        padding: 20px;
-    }
+        .event-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
 
-    .event-overlay.active {
-        display: flex;
-    }
+        .event-overlay.active {
+            display: flex;
+        }
 
-    .event-card {
-        background: #0a0a0a;
-        border: 2px solid #ff0000;
-        border-radius: 16px;
-        padding: 24px;
-        max-width: 340px;
-        width: 100%;
-        box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
-        transform: scale(0.9);
-        animation: popIn 0.3s forwards;
-    }
+        .event-card {
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+            transform: scale(0.9);
+            animation: popIn 0.3s forwards;
+        }
 
-    @keyframes popIn {
-        to { transform: scale(1); }
-    }
+        @keyframes popIn {
+            to { transform: scale(1); }
+        }
 
-    .event-title {
-        font-size: 18px;
-        color: #ff0000;
-        margin-bottom: 12px;
-        text-align: center;
-        font-weight: bold;
-    }
+        .event-title {
+            font-size: 18px;
+            color: #ff0000;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
 
-    .event-text {
-        font-size: 13px;
-        line-height: 1.6;
-        margin-bottom: 20px;
-        text-align: center;
-    }
+        .event-text {
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-    .event-btn {
-        width: 100%;
-        padding: 14px;
-        background: rgba(255, 0, 0, 0.2);
-        border: 1.5px solid #ff0000;
-        color: #ff0000;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+        .event-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 1.5px solid #ff0000;
+            color: #ff0000;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-    .event-btn:active {
-        background: rgba(255, 0, 0, 0.3);
-        transform: scale(0.98);
-    }
+        .event-btn:active {
+            background: rgba(255, 0, 0, 0.3);
+            transform: scale(0.98);
+        }
 
-    .info-section {
-        background: rgba(0, 255, 65, 0.03);
-        border: 1px solid rgba(0, 255, 65, 0.3);
-        border-radius: 10px;
-        padding: 12px;
-        font-size: 10px;
-        line-height: 1.6;
-        opacity: 0.8;
-    }
+        .info-section {
+            background: rgba(0, 255, 65, 0.03);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 10px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
 
-    .matrix-canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        opacity: 0.08;
-        z-index: 0;
-    }
+        .matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: 0;
+        }
 
-    .content-wrapper {
-        position: relative;
-        z-index: 1;
-    }
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
 
-    /* Scrollbar styling */
-    .log-section::-webkit-scrollbar {
-        width: 4px;
-    }
+        .log-section::-webkit-scrollbar {
+            width: 4px;
+        }
 
-    .log-section::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.3);
-    }
+        .log-section::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
 
-    .log-section::-webkit-scrollbar-thumb {
-        background: #00ff41;
-        border-radius: 2px;
-    }
+        .log-section::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border-radius: 2px;
+        }
 
-    .haptic-feedback {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 6px;
-        height: 6px;
-        background: #00ff41;
-        border-radius: 50%;
-        opacity: 0;
-        pointer-events: none;
-    }
+        .haptic-feedback {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 6px;
+            height: 6px;
+            background: #00ff41;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-    .haptic-feedback.active {
-        animation: hapticPulse 0.3s;
-    }
+        .haptic-feedback.active {
+            animation: hapticPulse 0.3s;
+        }
 
-    @keyframes hapticPulse {
-        0% { opacity: 0; transform: scale(1); }
-        50% { opacity: 1; transform: scale(3); }
-        100% { opacity: 0; transform: scale(1); }
-    }
-</style>
-```
+        @keyframes hapticPulse {
+            0% { opacity: 0; transform: scale(1); }
+            50% { opacity: 1; transform: scale(3); }
+            100% { opacity: 0; transform: scale(1); }
+        }
 
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            flex-direction: column;
+            color: #ff0000;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .game-over-overlay.active {
+            display: flex;
+        }
+
+        .game-over-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .game-over-stats {
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.8;
+            color: #00ff41;
+        }
+
+        .restart-btn {
+            padding: 16px 32px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            color: #ff0000;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .restart-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
 </head>
 <body>
     <canvas class="matrix-canvas" id="matrix"></canvas>
     <div class="haptic-feedback" id="haptic"></div>
 
-```
-<div class="tg-viewport">
-    <div class="content-wrapper">
-        <div class="container">
-            <div class="header">
-                <div class="title">⚠ SYSTEM COLLAPSE ⚠</div>
-                <div class="cycle-info">CYCLE <span id="cycle">0</span> | PROTOCOL ACTIVE</div>
-            </div>
+    <div class="tg-viewport">
+        <div class="content-wrapper">
+            <div class="container">
+                <div class="header">
+                    <div class="title">SYSTEM COLLAPSE</div>
+                    <div class="cycle-info">CYCLE <span id="cycle">0</span> | PROTOCOL ACTIVE</div>
+                </div>
 
-            <div class="metrics-grid">
-                <div class="metric-card" id="capitalCard">
-                    <div class="metric-label">CAPITAL</div>
-                    <div class="metric-value" id="capital">1000</div>
+                <div class="metrics-grid">
+                    <div class="metric-card" id="capitalCard">
+                        <div class="metric-label">CAPITAL</div>
+                        <div class="metric-value" id="capital">1000</div>
+                    </div>
+                    <div class="metric-card" id="workersCard">
+                        <div class="metric-label">WORKERS</div>
+                        <div class="metric-value" id="workers">10</div>
+                    </div>
+                    <div class="metric-card" id="factoriesCard">
+                        <div class="metric-label">FACTORIES</div>
+                        <div class="metric-value" id="factories">1</div>
+                    </div>
+                    <div class="metric-card" id="productionCard">
+                        <div class="metric-label">PRODUCTION</div>
+                        <div class="metric-value" id="production">0</div>
+                    </div>
+                    <div class="metric-card" id="wealthGapCard">
+                        <div class="metric-label">WEALTH GAP</div>
+                        <div class="metric-value" id="wealthGap">0%</div>
+                    </div>
+                    <div class="metric-card" id="techCard">
+                        <div class="metric-label">TECH LEVEL</div>
+                        <div class="metric-value" id="techLevel">1</div>
+                    </div>
+                    <div class="metric-card" id="inequalityCard">
+                        <div class="metric-label">INEQUALITY</div>
+                        <div class="metric-value" id="inequality">1.0x</div>
+                    </div>
+                    <div class="metric-card" id="stabilityCard">
+                        <div class="metric-label">STABILITY</div>
+                        <div class="metric-value" id="stability">100%</div>
+                    </div>
+                    <div class="metric-card" id="demandCard">
+                        <div class="metric-label">DEMAND</div>
+                        <div class="metric-value" id="demand">100%</div>
+                    </div>
                 </div>
-                <div class="metric-card" id="workersCard">
-                    <div class="metric-label">WORKERS</div>
-                    <div class="metric-value" id="workers">10</div>
-                </div>
-                <div class="metric-card" id="factoriesCard">
-                    <div class="metric-label">FACTORIES</div>
-                    <div class="metric-value" id="factories">1</div>
-                </div>
-                <div class="metric-card" id="productionCard">
-                    <div class="metric-label">PRODUCTION</div>
-                    <div class="metric-value" id="production">0</div>
-                </div>
-                <div class="metric-card" id="inequalityCard">
-                    <div class="metric-label">INEQUALITY</div>
-                    <div class="metric-value" id="inequality">1.0x</div>
-                </div>
-                <div class="metric-card" id="stabilityCard">
-                    <div class="metric-label">STABILITY</div>
-                    <div class="metric-value" id="stability">100%</div>
-                </div>
-            </div>
 
-            <div class="chaos-section">
-                <div class="chaos-label">SYSTEMIC CHAOS</div>
-                <div class="chaos-bar">
-                    <div class="chaos-fill" id="chaosFill"></div>
-                    <div class="chaos-text" id="chaosText">0%</div>
+                <div class="chaos-section">
+                    <div class="chaos-label">SYSTEMIC CHAOS</div>
+                    <div class="chaos-bar">
+                        <div class="chaos-fill" id="chaosFill" style="width: 0%"></div>
+                        <div class="chaos-text" id="chaosText">0%</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="actions-grid">
-                <button class="action-btn" id="buildBtn" onclick="game.buildFactory()">
-                    BUILD FACTORY
-                    <div class="action-cost">-500 CAP</div>
-                </button>
-                <button class="action-btn" id="hireBtn" onclick="game.hireWorkers()">
-                    HIRE WORKERS
-                    <div class="action-cost">-200 CAP</div>
-                </button>
-                <button class="action-btn" onclick="game.exploit()">
-                    MAX EXTRACT
-                    <div class="action-cost">+CHAOS</div>
-                </button>
-                <button class="action-btn" onclick="game.automate()">
-                    AUTOMATE
-                    <div class="action-cost">-WORKERS</div>
-                </button>
-                <button class="action-btn" onclick="game.speculate()">
-                    SPECULATE
-                    <div class="action-cost">VOLATILE</div>
-                </button>
-                <button class="action-btn" onclick="game.monopolize()">
-                    MONOPOLIZE
-                    <div class="action-cost">-1000 CAP</div>
-                </button>
-            </div>
+                <div class="actions-grid">
+                    <button class="action-btn" id="buildBtn" onclick="game.buildFactory()">
+                        BUILD FACTORY
+                        <div class="action-cost">-500 CAP</div>
+                    </button>
+                    <button class="action-btn" id="hireBtn" onclick="game.hireWorkers()">
+                        HIRE WORKERS
+                        <div class="action-cost">-200 CAP</div>
+                    </button>
+                    <button class="action-btn" id="raiseWagesBtn" onclick="game.raiseWages()">
+                        RAISE WAGES
+                        <div class="action-cost">-300 CAP</div>
+                    </button>
+                    <button class="action-btn" onclick="game.exploit()">
+                        MAX EXTRACT
+                        <div class="action-cost">+CHAOS</div>
+                    </button>
+                    <button class="action-btn" id="techBtn" onclick="game.investTech()">
+                        INVEST TECH
+                        <div class="action-cost">-800 CAP</div>
+                    </button>
+                    <button class="action-btn" onclick="game.automate()">
+                        AUTOMATE
+                        <div class="action-cost">-WORKERS</div>
+                    </button>
+                    <button class="action-btn" onclick="game.speculate()">
+                        SPECULATE
+                        <div class="action-cost">VOLATILE</div>
+                    </button>
+                    <button class="action-btn" id="monopolyBtn" onclick="game.monopolize()">
+                        MONOPOLIZE
+                        <div class="action-cost">-1500 CAP</div>
+                    </button>
+                    <button class="action-btn" id="lobbyBtn" onclick="game.lobbyGov()">
+                        LOBBY GOVT
+                        <div class="action-cost">-600 CAP</div>
+                    </button>
+                    <button class="action-btn" id="stimulusBtn" onclick="game.stimulus()">
+                        STIMULUS
+                        <div class="action-cost">-400 CAP</div>
+                    </button>
+                </div>
 
-            <div class="log-section" id="log">
-                <div class="log-entry">SYSTEM INITIALIZED</div>
-                <div class="log-entry">AWAITING COMMANDS</div>
-            </div>
+                <div class="log-section" id="log">
+                    <div class="log-entry">SYSTEM INITIALIZED</div>
+                    <div class="log-entry">AWAITING COMMANDS</div>
+                </div>
 
-            <div class="info-section">
-                <strong>OBSERVE:</strong> Each action creates consequences. 
-                Accumulation → Inequality → Instability → Collapse.
-                <br><br>
-                The system contains its contradictions. 
-                You are not controlling. You are witnessing.
+                <div class="info-section">
+                    <strong>НОВЫЕ МЕХАНИКИ:</strong><br>
+                    • <strong>DEMAND</strong> — без спроса производство падает<br>
+                    • <strong>WEALTH GAP</strong> — неравенство убивает спрос<br>
+                    • <strong>TECH LEVEL</strong> — повышает продуктивность<br>
+                    • <strong>Поднять зарплаты</strong> — снижает хаос, повышает спрос<br>
+                    • <strong>Лоббирование</strong> — временная стабилизация<br>
+                    • <strong>Стимулы</strong> — искусственный спрос<br><br>
+                    <strong>ЦЕЛЬ:</strong> Продержаться как можно дольше. Система всегда коллапсирует — вопрос только когда.
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="event-overlay" id="eventOverlay">
-    <div class="event-card">
-        <div class="event-title" id="eventTitle"></div>
-        <div class="event-text" id="eventText"></div>
-        <button class="event-btn" onclick="game.closeEvent()">ACKNOWLEDGE</button>
+    <div class="event-overlay" id="eventOverlay">
+        <div class="event-card">
+            <div class="event-title" id="eventTitle"></div>
+            <div class="event-text" id="eventText"></div>
+            <button class="event-btn" onclick="game.closeEvent()">ACKNOWLEDGE</button>
+        </div>
     </div>
-</div>
 
-<script>
-    // Telegram WebApp initialization
-    let tg = window.Telegram?.WebApp;
-    if (tg) {
-        tg.ready();
-        tg.expand();
-        tg.enableClosingConfirmation();
-        tg.setHeaderColor('#0a0a0a');
-        tg.setBackgroundColor('#0a0a0a');
-    }
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <div class="game-over-title">SYSTEM COLLAPSE</div>
+        <div class="game-over-stats" id="gameOverStats"></div>
+        <button class="restart-btn" onclick="location.reload()">RESTART</button>
+    </div>
 
-    // Matrix background
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const chars = '01$€¥₿';
-    const fontSize = 12;
-    const columns = Math.floor(canvas.width / fontSize);
-    const drops = Array(columns).fill(1);
-
-    function drawMatrix() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#00ff41';
-        ctx.font = fontSize + 'px monospace';
-
-        for (let i = 0; i < drops.length; i++) {
-            const char = chars[Math.floor(Math.random() * chars.length)];
-            ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-            drops[i]++;
+    <script>
+        // Telegram WebApp
+        let tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            tg.enableClosingConfirmation();
+            tg.setHeaderColor('#0a0a0a');
+            tg.setBackgroundColor('#0a0a0a');
         }
-    }
 
-    setInterval(drawMatrix, 50);
-
-    // Haptic feedback
-    function haptic(type = 'light') {
-        if (tg && tg.HapticFeedback) {
-            tg.HapticFeedback.impactOccurred(type);
-        }
-        const indicator = document.getElementById('haptic');
-        indicator.classList.add('active');
-        setTimeout(() => indicator.classList.remove('active'), 300);
-    }
-
-    // Game logic
-    const game = {
-        capital: 1000,
-        workers: 10,
-        factories: 1,
-        production: 0,
-        inequality: 1.0,
-        stability: 100,
-        chaos: 0,
-        cycle: 0,
-        gameOver: false,
-
-        events: [
-            {
-                title: '💥 ECONOMIC CRISIS',
-                text: 'Overproduction saturates markets. Capital evaporates: -30%',
-                effect: () => { game.capital *= 0.7; game.chaos += 15; }
-            },
-            {
-                title: '⚔️ WORKER UPRISING',
-                text: 'Inequality triggers revolt. Production halts. Workers flee.',
-                effect: () => { game.production = 0; game.workers = Math.floor(game.workers * 0.6); game.chaos += 20; }
-            },
-            {
-                title: '📉 MARKET CRASH',
-                text: 'Speculation bubble bursts. Capital obliterated: -60%',
-                effect: () => { game.capital = Math.floor(game.capital * 0.4); game.chaos += 25; }
-            },
-            {
-                title: '🤖 AUTOMATION CATASTROPHE',
-                text: 'Mass unemployment destabilizes society. Demand collapses.',
-                effect: () => { game.workers = Math.floor(game.workers * 0.3); game.stability -= 30; game.chaos += 30; }
-            },
-            {
-                title: '🏴 MONOPOLY STAGNATION',
-                text: 'No competition = no innovation. Entropy accelerates.',
-                effect: () => { game.production = Math.floor(game.production * 0.5); game.chaos += 20; }
-            },
-            {
-                title: '☠️ SYSTEMIC COLLAPSE',
-                text: 'Contradictions insurmountable. System failure complete.',
-                effect: () => { game.stability = 0; game.chaos = 100; game.gameOver = true; }
-            }
-        ],
-
-        init() {
-            this.update();
-            setInterval(() => this.tick(), 2500);
-        },
-
-        tick() {
-            if (this.gameOver) return;
-
-            this.cycle++;
-            this.production = Math.floor(this.factories * this.workers * (1 + this.inequality * 0.1));
-            this.capital += this.production;
-            
-            this.chaos += Math.random() * 2;
-            this.stability -= this.inequality * 0.5;
-            this.stability = Math.max(0, this.stability);
-
-            if (this.chaos > 30 && Math.random() > 0.88) {
-                this.triggerEvent();
-            }
-
-            if (this.chaos >= 100 || this.stability <= 0) {
-                this.triggerEvent(5);
-            }
-
-            this.update();
-            this.log(`[${this.cycle}] Production: +${this.production}`);
-        },
-
-        buildFactory() {
-            if (this.capital < 500) return;
-            haptic('medium');
-            this.capital -= 500;
-            this.factories++;
-            this.inequality += 0.2;
-            this.chaos += 5;
-            this.log('Factory built. Inequality grows.', 'crisis');
-            this.update();
-        },
-
-        hireWorkers() {
-            if (this.capital < 200) return;
-            haptic('light');
-            this.capital -= 200;
-            this.workers += 5;
-            this.chaos += 2;
-            this.log('Workers hired. Exploitation deepens.');
-            this.update();
-        },
-
-        exploit() {
-            haptic('heavy');
-            this.capital += this.workers * 50;
-            this.inequality += 0.5;
-            this.chaos += 10;
-            this.stability -= 5;
-            this.log('Extraction maximized. Tensions rise.', 'crisis');
-            this.update();
-        },
-
-        automate() {
-            if (this.workers < 5) return;
-            haptic('heavy');
-            this.workers = Math.floor(this.workers * 0.5);
-            this.production *= 1.5;
-            this.inequality += 0.8;
-            this.chaos += 15;
-            this.log('Automated. Workers displaced.', 'crisis');
-            this.update();
-        },
-
-        speculate() {
-            haptic('rigid');
-            const gamble = Math.random();
-            if (gamble > 0.5) {
-                const gain = Math.floor(this.capital * 0.5);
-                this.capital += gain;
-                this.log(`Speculation win! +${gain}`);
-            } else {
-                const loss = Math.floor(this.capital * 0.3);
-                this.capital -= loss;
-                this.chaos += 15;
-                this.log(`Speculation fail! -${loss}`, 'crisis');
-            }
-            this.update();
-        },
-
-        monopolize() {
-            if (this.capital < 1000) return;
-            haptic('heavy');
-            this.capital -= 1000;
-            this.production *= 1.3;
-            this.inequality += 1.0;
-            this.chaos += 12;
-            this.log('Monopoly achieved. Competition eliminated.', 'crisis');
-            this.update();
-        },
-
-        triggerEvent(index = null) {
-            haptic('heavy');
-            const event = index !== null ? this.events[index] : 
-                this.events[Math.floor(Math.random() * (this.events.length - 1))];
-            
-            document.getElementById('eventTitle').textContent = event.title;
-            document.getElementById('eventText').textContent = event.text;
-            document.getElementById('eventOverlay').classList.add('active');
-            
-            event.effect();
-            this.log(event.title, 'collapse');
-            this.update();
-
-            if (tg && this.gameOver) {
-                tg.showAlert('System has collapsed. Refresh to restart.');
-            }
-        },
-
-        closeEvent() {
-            haptic('light');
-            document.getElementById('eventOverlay').classList.remove('active');
-        },
-
-        log(message, type = '') {
-            const logDiv = document.getElementById('log');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
-            entry.textContent = message;
-            logDiv.appendChild(entry);
-            logDiv.scrollTop = logDiv.scrollHeight;
-
-            if (logDiv.children.length > 20) {
-                logDiv.removeChild(logDiv.children[0]);
-            }
-        },
-
-        update() {
-            document.getElementById('capital').textContent = Math.floor(this.capital);
-            document.getElementById('workers').textContent = this.workers;
-            document.getElementById('factories').textContent = this.factories;
-            document.getElementById('production').textContent = this.production;
-            document.getElementById('inequality').textContent = this.inequality.toFixed(1) + 'x';
-            document.getElementById('stability').textContent = Math.floor(this.stability) + '%';
-            document.getElementById('cycle').textContent = this.cycle;
-            
-            const chaosPercent = Math.min(Math.floor(this.chaos), 100);
-            document.getElementById('chaosFill').style.width = chaosPercent + '%';
-            document.getElementById('chaosText').textContent = chaosPercent + '%';
-
-            // Visual alerts
-            document.getElementById('stabilityCard').classList.toggle('alert', this.chaos > 50);
-            document.getElementById('inequalityCard').classList.toggle('alert', this.inequality > 3);
-            document.getElementById('capitalCard').classList.toggle('alert', this.capital < 300);
-
-            // Button states
-            document.getElementById('buildBtn').classList.toggle('disabled', this.capital < 500);
-            document.getElementById('hireBtn').classList.toggle('disabled', this.capital < 200);
-        }
-    };
-
-    window.addEventListener('resize', () => {
+        // Matrix Rain
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-    });
 
-    game.init();
-</script>
-```
+        const chars = '01$€¥₿ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 12;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(1);
 
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+
+        // Haptic
+        function haptic(type = 'light') {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
+            const el = document.getElementById('haptic');
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 300);
+        }
+
+        // Game Logic
+        const game = {
+            capital: 1000,
+            workers: 10,
+            factories: 1,
+            production: 0,
+            inequality: 1.0,
+            stability: 100,
+            chaos: 0,
+            cycle: 0,
+            techLevel: 1,
+            wealthGap: 0,
+            demand: 100,
+            monopolyPower: 0,
+            gameOver: false,
+            startTime: Date.now(),
+
+            events: [
+                { title: 'OVERPRODUCTION CRISIS', text: 'Markets saturated. Capital -25%. Demand -20%.', effect: () => { game.capital *= 0.75; game.chaos += 12; game.demand -= 20; } },
+                { title: 'LABOR STRIKE', text: 'Workers strike. Production halted. Workers flee.', effect: () => { game.production = Math.floor(game.production * 0.4); game.workers = Math.floor(game.workers * 0.8); game.chaos += 15; } },
+                { title: 'FINANCIAL CRASH', text: 'Bubble bursts. Capital -50%.', effect: () => { game.capital *= 0.5; game.chaos += 20; game.stability -= 15; } },
+                { title: 'AUTOMATION WAVE', text: 'Mass layoffs. Demand collapses.', effect: () => { game.workers = Math.floor(game.workers * 0.4); game.stability -= 25; game.chaos += 25; game.demand -= 30; } },
+                { title: 'MONOPOLY DECAY', text: 'Stagnation. Efficiency drops.', effect: () => { game.production *= 0.6; game.chaos += 18; game.techLevel = Math.max(1, game.techLevel - 1); } },
+                { title: 'DEMAND COLLAPSE', text: 'No one can buy. Markets implode.', effect: () => { game.demand = Math.max(20, game.demand - 40); game.production *= 0.5; game.chaos += 22; } },
+                { title: 'SOCIAL UPRISING', text: 'Revolution. Factories burn.', effect: () => { game.factories = Math.max(1, game.factories - 2); game.chaos += 30; game.stability -= 30; game.capital *= 0.7; } },
+                { title: 'TECH DISRUPTION', text: 'Industries obsolete.', effect: () => { game.production *= 0.5; game.workers = Math.floor(game.workers * 0.6); game.chaos += 20; } },
+                { title: 'TERMINAL CRISIS', text: 'System fails. No recovery.', effect: () => { game.stability = 0; game.chaos = 100; game.gameOver = true; } }
+            ],
+
+            init() {
+                this.update();
+                setInterval(() => this.tick(), 2500);
+            },
+
+            tick() {
+                if (this.gameOver) return;
+
+                this.cycle++;
+                const baseProd = this.factories * this.workers * this.techLevel * 0.5;
+                const demandMult = this.demand / 100;
+                this.production = Math.floor(baseProd * demandMult);
+                this.capital += this.production;
+
+                this.wealthGap = Math.min(99, (this.inequality - 1) * 20);
+                this.chaos += Math.random() * 1.2 + (this.inequality - 1) * 0.3;
+                this.stability -= (this.inequality - 1) * 0.3 + (100 - this.demand) * 0.05;
+                this.stability = Math.max(0, Math.min(100, this.stability));
+
+                this.demand += 0.5;
+                this.demand = Math.min(100 - this.wealthGap * 0.3, this.demand);
+                this.demand = Math.max(10, this.demand);
+
+                // Random events
+                if (this.chaos > 40 && Math.random() > 0.90) this.triggerEvent();
+                if (this.demand < 30 && Math.random() > 0.85) this.triggerEvent(5);
+                if (this.wealthGap > 70 && Math.random() > 0.88) this.triggerEvent(6);
+                if (this.chaos >= 100 || this.stability <= 0) this.triggerEvent(8);
+
+                this.update();
+                this.log(`[${this.cycle}] +${this.production} | Demand: ${Math.floor(this.demand)}%`);
+            },
+
+            buildFactory() { if (this.capital < 500) return; haptic('medium'); this.capital -= 500; this.factories++; this.inequality += 0.15; this.chaos += 4; this.log('Factory built.', 'crisis'); this.update(); },
+            hireWorkers() { if (this.capital < 200) return; haptic('light'); this.capital -= 200; this.workers += 5; this.chaos += 1.5; this.demand += 3; this.log('Workers hired.'); this.update(); },
+            raiseWages() { if (this.capital < 300) return; haptic('medium'); this.capital -= 300; this.chaos -= 8; this.demand += 15; this.inequality = Math.max(1, this.inequality - 0.2); this.stability += 5; this.log('Wages raised. Demand up.'); this.update(); },
+            exploit() { haptic('heavy'); this.capital += this.workers * 60; this.inequality += 0.4; this.chaos += 8; this.stability -= 4; this.demand -= 5; this.log('Max extraction.', 'crisis'); this.update(); },
+            investTech() { if (this.capital < 800) return; haptic('medium'); this.capital -= 800; this.techLevel++; this.chaos += 3; this.log(`Tech Level ${this.techLevel}`); this.update(); },
+            automate() { if (this.workers < 5) return; haptic('heavy'); const lost = Math.floor(this.workers * 0.5); this.workers -= lost; this.inequality += 0.6; this.chaos += 12; this.demand -= 8; this.log(`${lost} workers displaced.`, 'crisis'); this.update(); },
+            speculate() { haptic('rigid'); const win = Math.random() > 0.45; const amt = Math.floor(this.capital * (win ? 0.6 : 0.35)); win ? this.capital += amt : this.capital -= amt; this.chaos += win ? 5 : 18; this.log(`${win ? 'Win' : 'Loss'}: ${win ? '+' : '-'}${amt}`, win ? '' : 'crisis'); this.update(); },
+            monopolize() { if (this.capital < 1500 || this.monopolyPower >= 3) return; haptic('heavy'); this.capital -= 1500; this.monopolyPower++; this.production *= 1.2; this.inequality += 0.8; this.chaos += 10; this.demand -= 10; this.log('Monopoly expanded.', 'crisis'); this.update(); },
+            lobbyGov() { if (this.capital < 600) return; haptic('medium'); this.capital -= 600; this.chaos -= 10; this.stability += 8; this.inequality += 0.3; this.log('Lobbying successful.'); this.update(); },
+            stimulus() { if (this.capital < 400) return; haptic('light'); this.capital -= 400; this.demand += 25; this.chaos -= 5; this.log('Stimulus deployed.'); this.update(); },
+
+            triggerEvent(index = null) {
+                haptic('heavy');
+                const event = index !== null ? this.events[index] : this.events[Math.floor(Math.random() * (this.events.length - 1))];
+                document.getElementById('eventTitle').textContent = event.title;
+                document.getElementById('eventText').textContent = event.text;
+                document.getElementById('eventOverlay').classList.add('active');
+                event.effect();
+                this.log(event.title, 'collapse');
+                this.update();
+
+                if (this.gameOver) {
+                    this.endGame();
+                }
+            },
+
+            closeEvent() {
+                haptic('light');
+                document.getElementById('eventOverlay').classList.remove('active');
+            },
+
+            endGame() {
+                const duration = Math.floor((Date.now() - this.startTime) / 1000);
+                const stats = `Cycle: ${this.cycle}\nCapital: ${Math.floor(this.capital)}\nWorkers: ${this.workers}\nFactories: ${this.factories}\nDuration: ${duration}s`;
+                document.getElementById('gameOverStats').textContent = stats;
+                document.getElementById('gameOverOverlay').classList.add('active');
+                if (tg) tg.showAlert(`System collapsed at cycle ${this.cycle}.`);
+            },
+
+            log(message, type = '') {
+                const log = document.getElementById('log');
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = message;
+                log.appendChild(entry);
+                log.scrollTop = log.scrollHeight;
+                if (log.children.length > 25) log.removeChild(log.children[0]);
+            },
+
+            update() {
+                document.getElementById('capital').textContent = Math.floor(this.capital);
+                document.getElementById('workers').textContent = this.workers;
+                document.getElementById('factories').textContent = this.factories;
+                document.getElementById('production').textContent = this.production;
+                document.getElementById('inequality').textContent = this.inequality.toFixed(1) + 'x';
+                document.getElementById('stability').textContent = Math.floor(this.stability) + '%';
+                document.getElementById('cycle').textContent = this.cycle;
+                document.getElementById('techLevel').textContent = this.techLevel;
+                document.getElementById('wealthGap').textContent = Math.floor(this.wealthGap) + '%';
+                document.getElementById('demand').textContent = Math.floor(this.demand) + '%';
+
+                const chaosPct = Math.min(Math.floor(this.chaos), 100);
+                document.getElementById('chaosFill').style.width = chaosPct + '%';
+                document.getElementById('chaosText').textContent = chaosPct + '%';
+
+                // Alerts
+                const alert = (id, cond) => document.getElementById(id).classList.toggle('alert', cond);
+                alert('capitalCard', this.capital < 500);
+                alert('stabilityCard', this.stability < 50);
+                alert('demandCard', this.demand < 50);
+                alert('wealthGapCard', this.wealthGap > 60);
+                alert('inequalityCard', this.inequality > 3);
+
+                // Buttons
+                const btn = (id, cost) => document.getElementById(id)?.classList.toggle('disabled', this.capital < cost);
+                btn('buildBtn', 500); btn('hireBtn', 200); btn('raiseWagesBtn', 300);
+                btn('techBtn', 800); btn('monopolyBtn', 1500); btn('lobbyBtn', 600); btn('stimulusBtn', 400);
+            }
+        };
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        game.init();
+    </script>
 </body>
 </html>
