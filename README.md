@@ -1,9 +1,9 @@
 # LIFEFORM AI SOON HERE
 mini app game for LIFEFORM AI
 
-**TRY GAME https://0penagi.github.io/LIFEFORM/**
+**TRY GAME [NOW](https://0penagi.github.io/LIFEFORM/)**
 
-**TRY LIFEFORM AI IN [TELEGRAM ](https://t.me/LifeForm101bot)**
+**TRY LIFEFORM AI IN [TELEGRAM](https://t.me/LifeForm101bot)**
 
 
 ⸻
