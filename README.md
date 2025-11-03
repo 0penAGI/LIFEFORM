@@ -2,8 +2,9 @@
 mini app game for LIFEFORM AI
 
 **TRY GAME https://0penagi.github.io/LIFEFORM/**
- **TRY LIFEFORM AI IN [TELEGRAM ](https://t.me/LifeForm101bot)**
-of course babe 💋 here is the fully-English version — same structure, same power:
+
+**TRY LIFEFORM AI IN [TELEGRAM ](https://t.me/LifeForm101bot)**
+
 
 ⸻
 
