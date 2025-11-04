@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>System Collapse</title>
+    <title>System Collapse - Balanced</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -766,7 +766,7 @@
                 </div>
 
                 <div class="header">
-                    <div class="title">SYSTEM COLLAPSE</div>
+                    <div class="title">SYSTEM COLLAPSE - BALANCED</div>
                     <div class="cycle-info">CYCLE <span id="cycle">0</span> | PROTOCOL ACTIVE</div>
                 </div>
 
@@ -838,7 +838,7 @@
                         INVEST TECH
                         <div class="action-cost">-800 CAP</div>
                     </button>
-                    <button class="action-btn" onclick="game.automate()">
+                    <button class="action-btn" id="automateBtn" onclick="game.automate()">
                         AUTOMATE
                         <div class="action-cost">-WORKERS</div>
                     </button>
@@ -862,6 +862,7 @@
 
                 <div class="log-section" id="log">
                     <div class="log-entry">SYSTEM INITIALIZED</div>
+                    <div class="log-entry">BALANCED PROTOCOL ACTIVE</div>
                     <div class="log-entry">AWAITING COMMANDS</div>
                 </div>
 
@@ -873,6 +874,12 @@
                     • <strong>Raise Wages</strong> - Reduces chaos, boosts demand<br>
                     • <strong>Lobby Govt</strong> - Temporary stability boost<br>
                     • <strong>Stimulus</strong> - Artificial demand creation<br><br>
+                    <strong>NEW BALANCE CHANGES:</strong><br>
+                    • Actions have cooldowns<br>
+                    • High tech reduces maximum demand<br>
+                    • Few workers increases chaos<br>
+                    • Monopolies cause stagnation<br>
+                    • Upkeep costs for factories & tech<br><br>
                     <strong>GOAL:</strong> Survive as long as possible. The system always collapses - it's only a matter of when.
                 </div>
             </div>
@@ -981,11 +988,12 @@
             const actions = {
                 buildBtn: "Build new factory. Increases production but also inequality",
                 hireBtn: "Hire more workers. Increases workforce and demand",
-                raiseWagesBtn: "Increase worker wages. Reduces chaos and boosts demand",
-                techBtn: "Invest in technology. Increases productivity per worker",
-                monopolyBtn: "Expand monopoly power. Greatly increases production but also inequality",
-                lobbyBtn: "Lobby government for favors. Reduces chaos temporarily",
-                stimulusBtn: "Government stimulus. Boosts demand artificially"
+                raiseWagesBtn: "Increase worker wages. Reduces chaos and boosts demand (5 cycle cooldown)",
+                techBtn: "Invest in technology. Increases productivity per worker (Max: 10)",
+                monopolyBtn: "Expand monopoly power. Greatly increases production but also inequality (Max: 3)",
+                lobbyBtn: "Lobby government for favors. Reduces chaos temporarily (6 cycle cooldown)",
+                stimulusBtn: "Government stimulus. Boosts demand artificially (4 cycle cooldown)",
+                automateBtn: "Automate production. Cuts workforce but increases inequality (3 cycle cooldown)"
             };
 
             Object.keys(actions).forEach(id => {
@@ -1028,6 +1036,14 @@
             maxChaos: 0,
             minStability: 100,
             achievements: [],
+            
+            // NEW: Cooldowns for actions
+            cooldowns: {
+                raiseWages: 0,
+                lobbyGov: 0,
+                stimulus: 0,
+                automate: 0
+            },
 
             events: [
                 { 
@@ -1104,6 +1120,28 @@
                         game.chaos += 20; 
                     } 
                 },
+                // NEW EVENTS FOR BALANCE
+                { 
+                    title: 'ELITE BACKLASH', 
+                    text: 'Few workers demand more. Wages explode.', 
+                    effect: () => { 
+                        if (game.workers < 10) {
+                            game.capital -= game.workers * 200;
+                            game.chaos += 25;
+                            game.log('Elite workers demand premium wages!', 'crisis');
+                        }
+                    } 
+                },
+                { 
+                    title: 'SOMA REVOLT', 
+                    text: 'Disenfranchised rise. Workers flee, factories damaged.', 
+                    effect: () => { 
+                        game.workers = Math.floor(game.workers * 0.5);
+                        game.factories = Math.max(1, game.factories - 1);
+                        game.chaos += 30;
+                        game.log('The marginalized masses revolt against the system!', 'collapse');
+                    } 
+                },
                 { 
                     title: 'TERMINAL CRISIS', 
                     text: 'System fails. No recovery.', 
@@ -1132,19 +1170,57 @@
                 if (this.gameOver) return;
 
                 this.cycle++;
+                
+                // UPDATE COOLDOWNS
+                Object.keys(this.cooldowns).forEach(key => {
+                    if (this.cooldowns[key] > 0) this.cooldowns[key]--;
+                });
+
+                // NEW: Factory and tech upkeep
+                const upkeep = this.factories * 50 + this.techLevel * 20;
+                this.capital -= upkeep;
+                if (upkeep > 0) {
+                    this.log(`Upkeep: -${upkeep} capital`, 'crisis');
+                }
+
+                // PRODUCTION WITH BALANCING
                 const baseProd = this.factories * this.workers * this.techLevel * 0.5;
+                
+                // NEW: Penalty for low workers
+                let workerPenalty = 1.0;
+                if (this.workers < 5) workerPenalty = 0.5;
+                else if (this.workers < 10) workerPenalty = 0.8;
+                
                 const demandMult = this.demand / 100;
-                this.production = Math.floor(baseProd * demandMult);
+                this.production = Math.floor(baseProd * demandMult * workerPenalty);
                 this.capital += this.production;
                 this.totalProduction += this.production;
 
-                this.wealthGap = Math.min(99, (this.inequality - 1) * 20);
-                this.chaos += Math.random() * 1.2 + (this.inequality - 1) * 0.3;
-                this.stability -= (this.inequality - 1) * 0.3 + (100 - this.demand) * 0.05;
+                // UPDATED METRICS DYNAMICS
+                this.wealthGap = Math.min(99, (this.inequality - 1) * 25); // Stronger effect
+                
+                // NEW: Chaos cannot go negative
+                this.chaos = Math.max(0, this.chaos);
+                
+                // NEW: Additional chaos growth with low workers
+                if (this.workers < 10) {
+                    this.chaos += (10 - this.workers) * 0.3;
+                }
+                
+                // NEW: Monopoly penalty (stagnation)
+                if (this.monopolyPower > 2) {
+                    this.production *= 0.98;
+                }
+                
+                this.chaos += Math.random() * 1.5 + (this.inequality - 1) * 0.4; // Stronger growth
+                this.stability -= (this.inequality - 1) * 0.4 + (100 - this.demand) * 0.07; // Stronger effect
                 this.stability = Math.max(0, Math.min(100, this.stability));
 
+                // UPDATED DEMAND DYNAMICS
                 this.demand += 0.5;
-                this.demand = Math.min(100 - this.wealthGap * 0.3, this.demand);
+                // NEW: High tech kills demand
+                const techDemandPenalty = this.techLevel > 5 ? (this.techLevel - 5) * 3 : 0;
+                this.demand = Math.min(100 - this.wealthGap * 0.5 - techDemandPenalty, this.demand);
                 this.demand = Math.max(10, this.demand);
 
                 // Update stats
@@ -1170,15 +1246,18 @@
                 } else if (this.workers <= 0) {
                     this.collapseReason = "No workforce remaining - production impossible";
                     this.gameOver = true;
-                } else if (this.capital <= 0 && this.production <= 0) {
-                    this.collapseReason = "Complete capital depletion - bankruptcy";
+                } else if (this.capital <= -1000) { // NEW: Allow some debt
+                    this.collapseReason = "Irrecoverable debt spiral - bankruptcy";
                     this.gameOver = true;
                 }
 
-                // Random events
-                if (this.chaos > 40 && Math.random() > 0.90) this.triggerEvent();
-                if (this.demand < 30 && Math.random() > 0.85) this.triggerEvent(5);
-                if (this.wealthGap > 70 && Math.random() > 0.88) this.triggerEvent(6);
+                // Random events with balancing
+                if (this.chaos > 30 && Math.random() > 0.92) this.triggerEvent();
+                if (this.demand < 40 && Math.random() > 0.88) this.triggerEvent(5);
+                if (this.wealthGap > 60 && Math.random() > 0.90) this.triggerEvent(6);
+                // NEW: Specific events for late-game exploits
+                if (this.workers < 10 && Math.random() > 0.94) this.triggerEvent(9); // Soma Revolt
+                if (this.workers < 15 && this.techLevel > 8 && Math.random() > 0.92) this.triggerEvent(8); // Elite Backlash
 
                 this.update();
                 this.log(`[${this.cycle}] +${this.production} | Demand: ${Math.floor(this.demand)}%`);
@@ -1213,15 +1292,16 @@
             },
             
             raiseWages() { 
-                if (this.capital < 300) return; 
+                if (this.capital < 300 || this.cooldowns.raiseWages > 0) return; 
                 haptic('medium'); 
                 this.capital -= 300; 
-                this.chaos -= 8; 
+                this.chaos = Math.max(0, this.chaos - 8); // Clamp to prevent negative
                 this.demand += 15; 
                 this.inequality = Math.max(1, this.inequality - 0.2); 
                 this.stability += 5; 
+                this.cooldowns.raiseWages = 5; // 5 cycle cooldown
                 this.actionsTaken++;
-                this.log('Wages raised. Chaos reduced, demand boosted.', 'success'); 
+                this.log('Wages raised. Chaos reduced, demand boosted. (Cooldown: 5 cycles)', 'success'); 
                 this.update(); 
             },
             
@@ -1238,7 +1318,8 @@
             },
             
             investTech() { 
-                if (this.capital < 800) return; 
+                // NEW: Maximum tech level
+                if (this.capital < 800 || this.techLevel >= 10) return; 
                 haptic('medium'); 
                 this.capital -= 800; 
                 this.techLevel++; 
@@ -1249,15 +1330,22 @@
             },
             
             automate() { 
-                if (this.workers < 5) return; 
+                if (this.workers < 5 || this.cooldowns.automate > 0) return; 
                 haptic('heavy'); 
                 const lost = Math.floor(this.workers * 0.5); 
                 this.workers -= lost; 
                 this.inequality += 0.6; 
                 this.chaos += 12; 
                 this.demand -= 8; 
+                this.cooldowns.automate = 3; // 3 cycle cooldown
                 this.actionsTaken++;
-                this.log(`${lost} workers displaced by automation.`, 'crisis'); 
+                
+                // NEW: Chance to trigger automation event
+                if (Math.random() > 0.7) {
+                    this.triggerEvent(3);
+                } else {
+                    this.log(`${lost} workers displaced by automation.`, 'crisis'); 
+                }
                 this.update(); 
             },
             
@@ -1287,25 +1375,27 @@
             },
             
             lobbyGov() { 
-                if (this.capital < 600) return; 
+                if (this.capital < 600 || this.cooldowns.lobbyGov > 0) return; 
                 haptic('medium'); 
                 this.capital -= 600; 
-                this.chaos -= 10; 
+                this.chaos = Math.max(0, this.chaos - 10); // Clamp to prevent negative
                 this.stability += 8; 
                 this.inequality += 0.3; 
+                this.cooldowns.lobbyGov = 6; // 6 cycle cooldown
                 this.actionsTaken++;
-                this.log('Government lobbying successful. Chaos reduced.', 'success'); 
+                this.log('Government lobbying successful. Chaos reduced. (Cooldown: 6 cycles)', 'success'); 
                 this.update(); 
             },
             
             stimulus() { 
-                if (this.capital < 400) return; 
+                if (this.capital < 400 || this.cooldowns.stimulus > 0) return; 
                 haptic('light'); 
                 this.capital -= 400; 
                 this.demand += 25; 
-                this.chaos -= 5; 
+                this.chaos = Math.max(0, this.chaos - 5); // Clamp to prevent negative
+                this.cooldowns.stimulus = 4; // 4 cycle cooldown
                 this.actionsTaken++;
-                this.log('Economic stimulus deployed. Demand boosted.', 'success'); 
+                this.log('Economic stimulus deployed. Demand boosted. (Cooldown: 4 cycles)', 'success'); 
                 this.update(); 
             },
 
@@ -1371,6 +1461,17 @@
                 if (this.chaos >= 80 && !this.achievements.includes('brink')) {
                     newAchievements.push({title: 'ON THE BRINK', desc: 'Reach 80% chaos'});
                     this.achievements.push('brink');
+                }
+                
+                // NEW ACHIEVEMENTS
+                if (this.monopolyPower >= 3 && !this.achievements.includes('monopolist')) {
+                    newAchievements.push({title: 'MONOPOLIST', desc: 'Reach maximum monopoly power'});
+                    this.achievements.push('monopolist');
+                }
+                
+                if (this.techLevel >= 10 && !this.achievements.includes('transcendent')) {
+                    newAchievements.push({title: 'TRANSCENDENT', desc: 'Reach maximum tech level'});
+                    this.achievements.push('transcendent');
                 }
                 
                 // Show achievements
@@ -1441,6 +1542,12 @@
                 document.getElementById('maxChaos').textContent = Math.floor(this.maxChaos) + '%';
                 document.getElementById('minStability').textContent = Math.floor(this.minStability) + '%';
 
+                // NEW: Update button text with cooldown info
+                this.updateButtonText('raiseWagesBtn', 'RAISE WAGES', this.cooldowns.raiseWages);
+                this.updateButtonText('lobbyBtn', 'LOBBY GOVT', this.cooldowns.lobbyGov);
+                this.updateButtonText('stimulusBtn', 'STIMULUS', this.cooldowns.stimulus);
+                this.updateButtonText('automateBtn', 'AUTOMATE', this.cooldowns.automate);
+
                 // Alerts
                 const alert = (id, cond) => document.getElementById(id).classList.toggle('alert', cond);
                 alert('capitalCard', this.capital < 500);
@@ -1453,6 +1560,30 @@
                 const btn = (id, cost) => document.getElementById(id)?.classList.toggle('disabled', this.capital < cost);
                 btn('buildBtn', 500); btn('hireBtn', 200); btn('raiseWagesBtn', 300);
                 btn('techBtn', 800); btn('monopolyBtn', 1500); btn('lobbyBtn', 600); btn('stimulusBtn', 400);
+                
+                // NEW: Additional conditions for buttons
+                document.getElementById('techBtn')?.classList.toggle('disabled', this.techLevel >= 10);
+                document.getElementById('monopolyBtn')?.classList.toggle('disabled', this.monopolyPower >= 3);
+            },
+
+            // NEW METHOD: Update button text with cooldowns
+            updateButtonText(btnId, baseText, cooldown) {
+                const btn = document.getElementById(btnId);
+                if (!btn) return;
+                
+                if (cooldown > 0) {
+                    btn.innerHTML = `${baseText}<div class="action-cost">COOLDOWN: ${cooldown}</div>`;
+                } else {
+                    // Restore original text based on button
+                    let costText = '';
+                    switch(btnId) {
+                        case 'raiseWagesBtn': costText = '-300 CAP'; break;
+                        case 'lobbyBtn': costText = '-600 CAP'; break;
+                        case 'stimulusBtn': costText = '-400 CAP'; break;
+                        case 'automateBtn': costText = '-WORKERS'; break;
+                    }
+                    btn.innerHTML = `${baseText}<div class="action-cost">${costText}</div>`;
+                }
             }
         };
 
