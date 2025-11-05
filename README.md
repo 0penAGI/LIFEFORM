@@ -34,7 +34,9 @@ Features
 Installation
 	1.	Clone this repository:
 
-git clone [https://github.com/yourusername/hypermemory](https://github.com/0penAGI/LIFEFORM).git
+git clone [https://github.com/yourusername/hypermemory](https://github.com/0penAGI/LIFEFORM.git)
+
+
 cd hypermemory
 
 	2.	Install dependencies:
