@@ -10,7 +10,7 @@ mini app game for LIFEFORM AI
 
 ⸻
 
-**HyperMemory — Secret Resonance Core**
+# **HyperMemory — Secret Resonance Core**
 
 HyperMemory is a standalone module representing the core memory and resonance system of a distributed AI architecture. It is designed to simulate a holographic memory, resonance network, and quantum-inspired pattern analysis, giving the impression of a self-evolving intelligence.
 
