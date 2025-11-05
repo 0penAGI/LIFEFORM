@@ -34,7 +34,7 @@ Features
 Installation
 	1.	Clone this repository:
 
-git clone [(https://github.com/0penAGI/LIFEFORM.git)](https://github.com/0penAGI/LIFEFORM.git)
+git clone [https://github.com/0penAGI/LIFEFORM.git](https://github.com/0penAGI/LIFEFORM.git)
 
 
 cd hypermemory
